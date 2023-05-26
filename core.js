@@ -1,103 +1,20 @@
-// 输入数组
+// matriz de entrada
 var array;
 
-/**
- * 创建一颗普通树
- */
-function generateBiTree() {
-  let input = document.getElementById("inputBiTree");
-  array = input.value.split(",");
-
-  root = null;
-  if (array.length > 0) {
-    let num = parseInt(array[0]);
-    if (!isNaN(num)) {
-      root = new Node(num);
-      BiTreeInsert(array, 0, root);
-    }
-  }
-  showTree();
-}
+// -------------ARBOLES AVL---------------
 
 /**
- * 普通二叉树插入
+ * CREACION ARBOL AVL
  */
-function insertBiTree() {
-  if (!this.array) {
-    this.array = [];
-  }
-  let input = document.getElementById("inputBiTree");
-  let array = input.value.split(",");
-  array.forEach((v) => this.array.push(v));
-  generateBiTree();
-}
 
-// ===================== 排序树
-
-function generateBSTree() {
-  root = null;
-  insertBSTree();
-}
-
-function insertBSTree() {
-  let input = document.getElementById("inputBST");
-  array = input.value.split(",");
-
-  array.forEach((value) => {
-    let num = parseInt(value);
-    if (!isNaN(num)) {
-      root = BSTreeInsert(root, num);
-    }
-  });
-  showTree();
-}
-
-function removeBSTree() {
-  let input = document.getElementById("inputBST");
-  let array = input.value.split(",");
-  array.forEach((value) => {
-    let num = parseInt(value);
-    if (!isNaN(num)) {
-      root = BSTreeRemove(root, num);
-    }
-  });
-  showTree();
-}
-
-/**
- * 排序树转AVL
- */
-function BST2AVL() {
-  root = balanceNode(root);
-  showTree();
-}
-
-/**
- * 自底向上平衡二叉树，单次可能无法完全平衡
- * @param node
- * @returns {null|*}
- */
-function balanceNode(node) {
-  if (node == null) return null;
-  if (node.left != null) {
-    node.left = balanceNode(node.left);
-  }
-  if (node.right != null) {
-    node.right = balanceNode(node.right);
-  }
-  node.height = Math.max(getHeight(node.left), getHeight(node.right)) + 1;
-  return balanceSelf(node);
-}
-
-// ========================= AVL树
-
-/**
- * 创建avl树
- */
 function generateAVL() {
   root = null;
   insertAVL();
 }
+
+/**
+ * INSERTAR NUEVOS NODOS ARBOL AVL
+ */
 
 function insertAVL() {
   let input = document.getElementById("inputAVL");
@@ -113,7 +30,7 @@ function insertAVL() {
 }
 
 /**
- * 移除节点
+ * REMOVER NODOS ARBOL AVL
  */
 function removeAVL() {
   let input = document.getElementById("inputAVL");
@@ -127,19 +44,21 @@ function removeAVL() {
   showTree();
 }
 
-// ========================== 红黑树
+// -------------ARBOLES ROJO Y NEGRO---------------
 
 /**
- * 创建红黑树
+ * CREACION ARBOL ROJO Y NEGRO
  */
+
 function generateRBTree() {
   root = null;
   insertRBTree();
 }
 
 /**
- * 红黑树插入
+ * INSERTAR NUEVOS NODOS ARBOL ROJO Y NEGRO
  */
+
 function insertRBTree() {
   let input = document.getElementById("inputRBT");
   array = input.value.split(",");
@@ -155,8 +74,9 @@ function insertRBTree() {
 }
 
 /**
- * 红黑树插入
+ * REMOVER NODOS ARBOL AVL
  */
+
 function removeRBTree() {
   let input = document.getElementById("inputRBT");
   let array = input.value.split(",");
@@ -175,11 +95,12 @@ function removeRBTree() {
   showTree(true);
 }
 
-// =============== 渲染
+// -------------GRAFICAS ---------------
 
 /**
- * 渲染
+ * MOSTRAR ARBOLES
  */
+
 function showTree(color = false) {
   measure(root);
   initCanvas();
@@ -187,23 +108,24 @@ function showTree(color = false) {
   render(root, canvas.width / 2, 10 + radius, color);
 }
 
-// 节点半径
 var radius = 20;
-// 兄弟节点间距
 var spacing = 20;
-// 每层间距，父节点到子节点圆心距离
 var height = radius * 2 + 30;
-// 画布留白
 var padding = 20;
 
-var root = null;
 
+/***
+ * CREAR CANVA EN BLANCO
+*/
+
+var root = null;
 var canvas = null;
 var ctx = null;
 
 /***
- * 重新设置画布大小
+ * CAMBIAR TAMAÑO CANVA
  */
+
 function initCanvas() {
   canvas = document.getElementById("canvas");
   const cvHeight = (root.height - 1) * height + radius * 2 + padding * 2;
@@ -220,14 +142,19 @@ function initCanvas() {
   ctx.font = "bold " + 20 + "px serif";
 }
 
+/***
+ * LIMPIAR CANVA 
+ */
+
 function clear() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
 /**
- * 自底向上测量整个树宽度以及各节点位置
+ * 
  * @param node
  */
+
 function measure(node) {
   if (node == null) {
     return;
@@ -240,7 +167,7 @@ function measure(node) {
   measure(node.left);
   measure(node.right);
 
-  // 左右子树宽度
+  // ANCHO SUB ARBOL IZQUIERDO Y DERECHO
   let leftWidth = getWidth(node.left);
   let rightWidth = getWidth(node.right);
 
@@ -250,16 +177,15 @@ function measure(node) {
     node.width += spacing;
     node.offset = spacing / 2;
   } else {
-    // 当前为满二叉树时子树应该占据的空间
+    // SE DEFINE EL NUEVO ESPACIO A OCUPAR
     let childSpace = Math.max(rightWidth, leftWidth);
     let factor = getHeight(node.left) - getHeight(node.right);
     node.width = childSpace * 2;
     node.offset = childSpace / 2;
-    // 宽度比较小子树的边缘到当前树中线的空隙间距，这部分空白可以去掉
     let mixWidth = Math.abs(leftWidth - rightWidth) / 2;
     if (factor > 0) {
       if (leftWidth >= rightWidth) {
-        // 较高的子树宽度大于较低的子树时，可以使它们进一步靠近缩减空间
+        // SE ACERCAN LOS NODOS PARA REDUCIR ESPACIO
         let div = Math.pow(2, getHeight(node.right));
         let leftSpace = leftWidth / div - radius;
         if (leftSpace < 0) {
@@ -282,10 +208,10 @@ function measure(node) {
     console.log("mixWidth: " + mixWidth);
     node.width -= mixWidth;
     node.offset -= mixWidth / 2;
-    // 节点之间添加空隙
+    // SE AÑADE EL ESPACIO ENTRE NODOS
     node.width += spacing;
     node.offset += spacing / 2;
-    // 左右子节点圆心距离
+    // SE GENERA DISTANCIA ENTRE LOS NODOS HIJOS
     let distance = childSpace - mixWidth + spacing;
     if (fixNode) {
       let fix = fixWidth(fixNode.offset, distance);
@@ -296,22 +222,18 @@ function measure(node) {
 }
 
 /**
- * 修复连接线和节点重合问题
- * @param offset 子树N圆心到其下一层子树NChild圆心的距离
- * @param distance 子树N圆心到其兄弟节点NBrother圆心的距离
+ * 
+ * @param offset 
+ * @param distance 
  * @returns {number}
  */
 function fixWidth(offset, distance) {
-  // 这里通过判断夹角是否比切线夹角小确定是否有连接线和节点重叠
+  // VERIFICAR SI HAY NODOS O LINEAS SUPERPUESTAS
   if (Math.atan(height / offset) < Math.asin(radius / distance)) {
-    // let sin = radius / (x + distance);
-    // let tan = height / (x + f);
-    // tan = sin/sqrt(1-sin^2)
     let sR = radius * radius;
     let sF = offset * offset;
     let sD = distance * distance;
     let sH = height * height;
-    // 一元二次方程求根
     let a = sR - sH;
     let b = 2 * (sR * offset - sH * distance);
     let c = sH * sR + sR * sF - sH * sD;
@@ -327,7 +249,7 @@ function getWidth(node) {
 }
 
 /**
- * 该子树是否为单链表
+ * SE VERIFICA SI EL SUB-ARBOL ES UNA LISTA ENLAZADA
  * @param node
  * @returns {boolean}
  */
@@ -339,7 +261,7 @@ function isLinkedList(node) {
 }
 
 /**
- * 绘制树
+ * SE DIBUJA EL ARBOL EN PANTALLA
  * @param node
  * @param x
  * @param y
@@ -384,25 +306,8 @@ function render(node, x, y, color = false) {
 }
 
 /**
- * 生成一颗随机二叉树
+ * GENERAR NODOS ALEATORIOS
  */
-function randomBiTree() {
-  let count = 200;
-  let array = new Array(count);
-  array[0] = 1;
-  for (let i = 1; i < count; i++) {
-    let seed = Math.round(Math.random() * 4);
-    if (seed) {
-      array[i] = i;
-    } else {
-      array[i] = "null";
-    }
-  }
-  let input = document.getElementById("inputBiTree");
-  input.value = array.toString();
-  generateBiTree();
-}
-
 function randomSet() {
   let count = 50;
   let array = new Array(count);
@@ -419,17 +324,9 @@ function randomSet() {
   return array;
 }
 
-/**
- * 生成一颗随机排序树
- */
-function randomBSTree() {
-  let input = document.getElementById("inputBST");
-  input.value = randomSet().toString();
-  generateBSTree();
-}
 
 /**
- * 生成一颗随机AVL树
+ * INSERTAR ALEATORIO AVL
  */
 function randomAVLTree() {
   let input = document.getElementById("inputAVL");
@@ -438,7 +335,7 @@ function randomAVLTree() {
 }
 
 /**
- * 生成一颗随机红黑树
+ * INSERTAR ALEATORIO ROJO Y NEGRO
  */
 function randomRBTree() {
   let input = document.getElementById("inputRBT");
