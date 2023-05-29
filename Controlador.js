@@ -67,7 +67,7 @@ function insertRBTree() {
     let num = parseInt(array[i]);
     if (!isNaN(num)) {
       root = RBTreeInsert(root, num);
-      root.color = BLACK;
+      root.color = NEGRO;
     }
   }
   showTree(true);
@@ -83,7 +83,10 @@ function removeRBTree() {
   for (let i = 0; i < array.length; i++) {
     let num = parseInt(array[i]);
     if (!isNaN(num)) {
-      if (root == null || (root.left == null && root.right == null)) {
+      if (
+        root == null ||
+        (root.hijoIzquierdo == null && root.hijoDerecho == null)
+      ) {
         root = null;
         break;
       } else {
@@ -113,10 +116,9 @@ var spacing = 20;
 var height = radius * 2 + 30;
 var padding = 20;
 
-
 /***
  * CREAR CANVA EN BLANCO
-*/
+ */
 
 var root = null;
 var canvas = null;
@@ -128,7 +130,7 @@ var ctx = null;
 
 function initCanvas() {
   canvas = document.getElementById("canvas");
-  const cvHeight = (root.height - 1) * height + radius * 2 + padding * 2;
+  const cvHeight = (root.altura - 1) * height + radius * 2 + padding * 2;
   const cvWidth = root.width + padding * 2;
   canvas.style.height = cvHeight + "px";
   canvas.style.width = cvWidth + "px";
@@ -143,7 +145,7 @@ function initCanvas() {
 }
 
 /***
- * LIMPIAR CANVA 
+ * LIMPIAR CANVA
  */
 
 function clear() {
@@ -151,80 +153,80 @@ function clear() {
 }
 
 /**
- * 
- * @param node
+ *
+ * @param nodo
  */
 
-function measure(node) {
-  if (node == null) {
+function measure(nodo) {
+  if (nodo == null) {
     return;
   }
-  if (!node.left && !node.right) {
-    node.isLinkedList = true;
-    node.width = radius * 2;
+  if (!nodo.hijoIzquierdo && !nodo.hijoDerecho) {
+    nodo.isLinkedList = true;
+    nodo.width = radius * 2;
     return;
   }
-  measure(node.left);
-  measure(node.right);
+  measure(nodo.hijoIzquierdo);
+  measure(nodo.hijoDerecho);
 
   // ANCHO SUB ARBOL IZQUIERDO Y DERECHO
-  let leftWidth = getWidth(node.left);
-  let rightWidth = getWidth(node.right);
+  let leftWidth = getWidth(nodo.hijoIzquierdo);
+  let rightWidth = getWidth(nodo.hijoDerecho);
 
   let fixNode = null;
-  if (!node.left || !node.right) {
-    node.width = leftWidth + rightWidth;
-    node.width += spacing;
-    node.offset = spacing / 2;
+  if (!nodo.hijoIzquierdo || !nodo.hijoDerecho) {
+    nodo.width = leftWidth + rightWidth;
+    nodo.width += spacing;
+    nodo.offset = spacing / 2;
   } else {
     // SE DEFINE EL NUEVO ESPACIO A OCUPAR
     let childSpace = Math.max(rightWidth, leftWidth);
-    let factor = getHeight(node.left) - getHeight(node.right);
-    node.width = childSpace * 2;
-    node.offset = childSpace / 2;
+    let factor =
+      obtenerAltura(nodo.hijoIzquierdo) - obtenerAltura(nodo.hijoDerecho);
+    nodo.width = childSpace * 2;
+    nodo.offset = childSpace / 2;
     let mixWidth = Math.abs(leftWidth - rightWidth) / 2;
     if (factor > 0) {
       if (leftWidth >= rightWidth) {
         // SE ACERCAN LOS NODOS PARA REDUCIR ESPACIO
-        let div = Math.pow(2, getHeight(node.right));
+        let div = Math.pow(2, obtenerAltura(nodo.hijoDerecho));
         let leftSpace = leftWidth / div - radius;
         if (leftSpace < 0) {
           leftSpace = 0;
         }
         mixWidth += leftSpace;
-        fixNode = node.left;
+        fixNode = nodo.hijoIzquierdo;
       }
     } else if (factor < 0) {
       if (rightWidth >= leftWidth) {
-        let div = Math.pow(2, getHeight(node.left));
+        let div = Math.pow(2, obtenerAltura(nodo.hijoIzquierdo));
         let rightSpace = rightWidth / div - radius;
         if (rightSpace < 0) {
           rightSpace = 0;
         }
         mixWidth += rightSpace;
-        fixNode = node.right;
+        fixNode = nodo.hijoDerecho;
       }
     }
-    console.log("mixWidth: " + mixWidth);
-    node.width -= mixWidth;
-    node.offset -= mixWidth / 2;
+    nodo.width -= mixWidth;
+    nodo.offset -= mixWidth / 2;
     // SE AÑADE EL ESPACIO ENTRE NODOS
-    node.width += spacing;
-    node.offset += spacing / 2;
+    nodo.width += spacing;
+    nodo.offset += spacing / 2;
     // SE GENERA DISTANCIA ENTRE LOS NODOS HIJOS
     let distance = childSpace - mixWidth + spacing;
     if (fixNode) {
       let fix = fixWidth(fixNode.offset, distance);
-      node.width += fix;
-      node.offset += fix / 2;
+      nodo.width += fix;
+      nodo.offset += fix / 2;
     }
   }
 }
 
 /**
- * 
- * @param offset 
- * @param distance 
+ *
+ * @param offset
+ * @param distance
  * @returns {number}
  */
 function fixWidth(offset, distance) {
@@ -244,56 +246,58 @@ function fixWidth(offset, distance) {
   return 0;
 }
 
-function getWidth(node) {
-  return node ? node.width : 0;
+function getWidth(nodo) {
+  return nodo ? nodo.width : 0;
 }
 
 /**
  * SE VERIFICA SI EL SUB-ARBOL ES UNA LISTA ENLAZADA
- * @param node
+ * @param nodo
  * @returns {boolean}
  */
-function isLinkedList(node) {
-  let factor = Math.abs(getHeight(node.left) - getHeight(node.right));
-  if (factor === node.height - 1) {
+function isLinkedList(nodo) {
+  let factor = Math.abs(
+    obtenerAltura(nodo.hijoIzquierdo) - obtenerAltura(nodo.hijoDerecho)
+  );
+  if (factor === nodo.altura - 1) {
     return true;
   }
 }
 
 /**
  * SE DIBUJA EL ARBOL EN PANTALLA
- * @param node
+ * @param nodo
  * @param x
  * @param y
  * @param color
  */
-function render(node, x, y, color = false) {
-  if (node == null) {
+function render(nodo, x, y, color = false) {
+  if (nodo == null) {
     return;
   }
-  if (node.left != null) {
-    let lx = x - node.offset;
+  if (nodo.hijoIzquierdo != null) {
+    let lx = x - nodo.offset;
     let ly = y + height;
     ctx.beginPath();
     ctx.moveTo(x, y);
     ctx.lineTo(lx, ly);
     ctx.stroke();
-    render(node.left, lx, ly, color);
+    render(nodo.hijoIzquierdo, lx, ly, color);
   }
-  if (node.right != null) {
-    let rx = x + node.offset;
+  if (nodo.hijoDerecho != null) {
+    let rx = x + nodo.offset;
     let ry = y + height;
     ctx.beginPath();
     ctx.moveTo(x, y);
     ctx.lineTo(rx, ry);
     ctx.stroke();
-    render(node.right, rx, ry, color);
+    render(nodo.hijoDerecho, rx, ry, color);
   }
   ctx.beginPath();
   ctx.arc(x, y, radius, 0, 2 * Math.PI);
   ctx.closePath();
   if (color) {
-    ctx.fillStyle = node.color === RED ? "red" : "black";
+    ctx.fillStyle = nodo.color === ROJO ? "red" : "black";
     ctx.fill("nonzero");
     ctx.fillStyle = "white";
   } else {
@@ -302,7 +306,7 @@ function render(node, x, y, color = false) {
     ctx.fillStyle = "black";
   }
   ctx.stroke();
-  ctx.fillText(node.value.toString(), x, y);
+  ctx.fillText(nodo.valor.toString(), x, y);
 }
 
 /**
@@ -323,7 +327,6 @@ function randomSet() {
   });
   return array;
 }
-
 
 /**
  * INSERTAR ALEATORIO AVL
