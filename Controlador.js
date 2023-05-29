@@ -137,10 +137,10 @@ function eliminarRojoYNegro() {
  * se limpia y se renderizan los nodos
  */
 function mostrarArbol(color = false) {  
-  measure(root);
+  medidas(root);
   inicialiizarCanva();
   limpiar();
-  render(root, canvas.width / 2, 10 + radius, color);
+  render(root, canvas.ancho / 2, 10 + radius, color);
 }
 
 //Se definen las variables del canva, controlan el camaño
@@ -158,11 +158,11 @@ var ctx = null;
 function inicialiizarCanva() {
   canvas = document.getElementById("canvas");
   const cvHeight = (root.altura - 1) * height + radius * 2 + padding * 2;
-  const cvWidth = root.width + padding * 2;
+  const cvWidth = root.ancho + padding * 2;
   canvas.style.height = cvHeight + "px";
-  canvas.style.width = cvWidth + "px";
+  canvas.style.ancho = cvWidth + "px";
   canvas.height = cvHeight;
-  canvas.width = cvWidth;
+  canvas.ancho = cvWidth;
   ctx = canvas.getContext("2d");
   ctx.strokeStyle = "#000";
   ctx.fillStyle = "#fff";
@@ -176,40 +176,41 @@ function inicialiizarCanva() {
  * se una una funcion externa para ello, definiendo el tamaño del canva
  */
 function limpiar() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.clearRect(0, 0, canvas.ancho, canvas.height);
 }
 
 /**
  *
  * @param nodo
+ * se define una funcion que maneje las medidas, a la hora de dibujar el arbol
  */
-function measure(nodo) {
+function medidas(nodo) {
   if (nodo == null) {
     return;
   }
   if (!nodo.hijoIzquierdo && !nodo.hijoDerecho) {
     nodo.isLinkedList = true;
-    nodo.width = radius * 2;
+    nodo.ancho = radius * 2;
     return;
   }
-  measure(nodo.hijoIzquierdo);
-  measure(nodo.hijoDerecho);
+  medidas(nodo.hijoIzquierdo);
+  medidas(nodo.hijoDerecho);
 
   // ANCHO SUB ARBOL IZQUIERDO Y DERECHO
-  let leftWidth = getWidth(nodo.hijoIzquierdo);
-  let rightWidth = getWidth(nodo.hijoDerecho);
+  let leftWidth = obtenerAncho(nodo.hijoIzquierdo);
+  let rightWidth = obtenerAncho(nodo.hijoDerecho);
 
-  let fixNode = null;
+  let fixNodo = null;
   if (!nodo.hijoIzquierdo || !nodo.hijoDerecho) {
-    nodo.width = leftWidth + rightWidth;
-    nodo.width += spacing;
+    nodo.ancho = leftWidth + rightWidth;
+    nodo.ancho += spacing;
     nodo.offset = spacing / 2;
   } else {
     // SE DEFINE EL NUEVO ESPACIO A OCUPAR
     let childSpace = Math.max(rightWidth, leftWidth);
     let factor =
       obtenerAltura(nodo.hijoIzquierdo) - obtenerAltura(nodo.hijoDerecho);
-    nodo.width = childSpace * 2;
+    nodo.ancho = childSpace * 2;
     nodo.offset = childSpace / 2;
     let mixWidth = Math.abs(leftWidth - rightWidth) / 2;
     if (factor > 0) {
@@ -221,7 +222,7 @@ function measure(nodo) {
           leftSpace = 0;
         }
         mixWidth += leftSpace;
-        fixNode = nodo.hijoIzquierdo;
+        fixNodo = nodo.hijoIzquierdo;
       }
     } else if (factor < 0) {
       if (rightWidth >= leftWidth) {
@@ -231,19 +232,19 @@ function measure(nodo) {
           rightSpace = 0;
         }
         mixWidth += rightSpace;
-        fixNode = nodo.hijoDerecho;
+        fixNodo = nodo.hijoDerecho;
       }
     }
-    nodo.width -= mixWidth;
+    nodo.ancho -= mixWidth;
     nodo.offset -= mixWidth / 2;
     // SE AÑADE EL ESPACIO ENTRE NODOS
-    nodo.width += spacing;
+    nodo.ancho += spacing;
     nodo.offset += spacing / 2;
     // SE GENERA DISTANCIA ENTRE LOS NODOS HIJOS
     let distance = childSpace - mixWidth + spacing;
-    if (fixNode) {
-      let fix = fixWidth(fixNode.offset, distance);
-      nodo.width += fix;
+    if (fixNodo) {
+      let fix = fixWidth(fixNodo.offset, distance);
+      nodo.ancho += fix;
       nodo.offset += fix / 2;
     }
   }
@@ -272,8 +273,8 @@ function fixWidth(offset, distance) {
   return 0;
 }
 
-function getWidth(nodo) {
-  return nodo ? nodo.width : 0;
+function obtenerAncho(nodo) {
+  return nodo ? nodo.ancho : 0;
 }
 
 /**

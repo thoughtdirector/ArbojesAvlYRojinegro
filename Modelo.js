@@ -23,7 +23,7 @@ function obtenerAltura(nodo) {
  * @param nodo
  * @returns {number}
  */
-function getBalanceFactor(nodo) {
+function obtenerFactorDeBalance(nodo) {
   let lh = obtenerAltura(nodo.hijoIzquierdo);
   let rh = obtenerAltura(nodo.hijoDerecho);
   return lh - rh;
@@ -31,14 +31,14 @@ function getBalanceFactor(nodo) {
 
 /**
  * 获取排序树最小节点
- * @param node
+ * @param nodo
  * @returns {*}
  */
-function getBSTreeMin(node) {
-  while (node.hijoIzquierdo) {
-    node = node.hijoIzquierdo;
+function getBSTreeMin(nodo) {
+  while (nodo.hijoIzquierdo) {
+    nodo = nodo.hijoIzquierdo;
   }
-  return node;
+  return nodo;
 }
 
 /**
@@ -96,17 +96,17 @@ function leftRotate(nodo) {
  * @returns {*}
  */
 function balanceSelf(nodo) {
-  if (getBalanceFactor(nodo) > 1 && getBalanceFactor(nodo.hijoIzquierdo) >= 0) {
+  if (obtenerFactorDeBalance(nodo) > 1 && obtenerFactorDeBalance(nodo.hijoIzquierdo) >= 0) {
     nodo = rightRotate(nodo);
   }
-  if (getBalanceFactor(nodo) < -1 && getBalanceFactor(nodo.hijoDerecho) <= 0) {
+  if (obtenerFactorDeBalance(nodo) < -1 && obtenerFactorDeBalance(nodo.hijoDerecho) <= 0) {
     nodo = leftRotate(nodo);
   }
-  if (getBalanceFactor(nodo) > 1 && getBalanceFactor(nodo.hijoIzquierdo) < 0) {
+  if (obtenerFactorDeBalance(nodo) > 1 && obtenerFactorDeBalance(nodo.hijoIzquierdo) < 0) {
     nodo.hijoIzquierdo = leftRotate(nodo.hijoIzquierdo);
     nodo = rightRotate(nodo);
   }
-  if (getBalanceFactor(nodo) < -1 && getBalanceFactor(nodo.hijoDerecho) > 0) {
+  if (obtenerFactorDeBalance(nodo) < -1 && obtenerFactorDeBalance(nodo.hijoDerecho) > 0) {
     nodo.hijoDerecho = rightRotate(nodo.hijoDerecho);
     nodo = leftRotate(nodo);
   }
@@ -276,7 +276,7 @@ function RBTreeRemove(nodo, valor) {
   } else {
     if (nodo.hijoIzquierdo == null && nodo.hijoDerecho == null) {
       // CASO #1
-      fixRBNode(nodo);
+      fixRBNodo(nodo);
       if (nodo === nodo.padre.hijoIzquierdo) {
         nodo.padre.hijoIzquierdo = null;
       } else {
@@ -310,7 +310,7 @@ function RBTreeRemove(nodo, valor) {
  * @param nodo
  * @returns {*}
  */
-function fixRBNode2(nodo) {
+function fixRBNodo2(nodo) {
   let padre = nodo.padre;
   if (padre == null) {
     return nodo;
@@ -329,7 +329,7 @@ function fixRBNode2(nodo) {
       } else {
         if (brother.hijoIzquierdo == null && brother.hijoDerecho == null) {
           brother.color = ROJO;
-          return fixRBNode2(padre);
+          return fixRBNodo2(padre);
         } else if (brother.hijoDerecho == null) {
           brother.hijoIzquierdo.color = NEGRO;
           brother.color = ROJO;
@@ -362,7 +362,7 @@ function fixRBNode2(nodo) {
       } else {
         if (brother.hijoIzquierdo == null && brother.hijoDerecho == null) {
           brother.color = ROJO;
-          return fixRBNode2(padre);
+          return fixRBNodo2(padre);
         } else if (brother.hijoIzquierdo == null) {
           brother.hijoDerecho.color = NEGRO;
           brother.color = ROJO;
@@ -393,7 +393,7 @@ function fixRBNode2(nodo) {
  * SE SELECCIONA EL CASO SEGUN LA ELIMINACION
  * @param nodo
  */
-function fixRBNode(nodo) {
+function fixRBNodo(nodo) {
   while (nodo.padre != null && nodo.color === NEGRO) {
     let padre = nodo.padre;
     let grand = padre.padre;
