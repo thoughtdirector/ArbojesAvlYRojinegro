@@ -5,12 +5,12 @@ function randomRBTreeRemove() {
   let index = Math.ceil(Math.random() * array.length - 1);
   RBTreeRemove(root, array[index]);
   array.splice(index);
-  root = getRoot(root);
+  root = definirRaiz(root);
   // let isRB = isRBTree(root);
   // if (!isRB) {
   //   console.log("remove value:" + array[index] + "====isRB:"+isRB);
   // }
-  showTree(true);
+  mostrarArbol(true);
 }
 
 function randomAVLTreeRemove() {
@@ -21,5 +21,5 @@ function randomAVLTreeRemove() {
   // if (!res) {
   //   console.log("remove value:" + array[index] + "====isAVL:"+res);
   // }
-  showTree();
+  mostrarArbol();
 }
