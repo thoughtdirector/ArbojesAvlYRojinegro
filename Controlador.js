@@ -5,18 +5,25 @@ var array;
 
 /**
  * CREACION ARBOL AVL
+ * 
+ * Se define la raiz con altura nula
  */
 
-function generateAVL() {
+function generarAVL() {
   root = null;
-  insertAVL();
+  insertarAVL();
 }
 
 /**
  * INSERTAR NUEVOS NODOS ARBOL AVL
+ * 
+ * Se separan todos los nodos, por medio de la coma
+ * luego son convertidos a int 
+ * se valida que el dato ingresado sea un numero
+ * si pasa la validacion, se insertan al arbol 
  */
 
-function insertAVL() {
+function insertarAVL() {
   let input = document.getElementById("inputAVL");
   array = input.value.split(",");
 
@@ -26,13 +33,18 @@ function insertAVL() {
       root = BSTreeInsert(root, num, true);
     }
   }
-  showTree();
+  mostrarArbol();
 }
 
 /**
  * REMOVER NODOS ARBOL AVL
+ * 
+ * Se separan todos los nodos, por medio de la coma
+ * luego son convertidos a int 
+ * se valida que el dato ingresado sea un numero
+ * si pasa la validacion, se remueven del arbol 
  */
-function removeAVL() {
+function eliminarAVL() {
   let input = document.getElementById("inputAVL");
   let array = input.value.split(",");
   for (let i = 0; i < array.length; i++) {
@@ -41,25 +53,33 @@ function removeAVL() {
       root = BSTreeRemove(root, num, true);
     }
   }
-  showTree();
+  mostrarArbol();
 }
 
 // -------------ARBOLES ROJO Y NEGRO---------------
 
 /**
  * CREACION ARBOL ROJO Y NEGRO
+ * 
+  * Se define la raiz con altura nula
  */
 
-function generateRBTree() {
+function generarRojoYNegro() {
   root = null;
-  insertRBTree();
+  insertarRojoYNegro();
 }
 
 /**
  * INSERTAR NUEVOS NODOS ARBOL ROJO Y NEGRO
+ * 
+ * Se separan todos los nodos, por medio de la coma
+ * luego son convertidos a int 
+ * se valida que el dato ingresado sea un numero
+ * si pasa la validacion, se insertan al arbol
+ * se define el color de la raiz como negro
  */
 
-function insertRBTree() {
+function insertarRojoYNegro() {
   let input = document.getElementById("inputRBT");
   array = input.value.split(",");
 
@@ -70,14 +90,23 @@ function insertRBTree() {
       root.color = NEGRO;
     }
   }
-  showTree(true);
+  mostrarArbol(true);
 }
 
 /**
  * REMOVER NODOS ARBOL AVL
+ * 
+ * Se separan todos los nodos, por medio de la coma
+ * luego son convertidos a int 
+ * se valida que el dato ingresado sea un numero 
+ * si pasa la validacion se hacen las siguientes
+ * se valida si la raiz es nula o ambos de sus hijos lo som
+ * se define la raiz como nula y se rompe el programa en caso de que si
+ * en caso de que no se remueven del arbol 
+ * y se guareda el valor de la raiz
  */
 
-function removeRBTree() {
+function eliminarRojoYNegro() {
   let input = document.getElementById("inputRBT");
   let array = input.value.split(",");
   for (let i = 0; i < array.length; i++) {
@@ -91,44 +120,42 @@ function removeRBTree() {
         break;
       } else {
         RBTreeRemove(root, num);
-        root = getRoot(root);
+        root = definirRaiz(root);
       }
     }
   }
-  showTree(true);
+  mostrarArbol(true);
 }
 
 // -------------GRAFICAS ---------------
 
 /**
  * MOSTRAR ARBOLES
+ * 
+ * se define la raiz del arbol
+ * se inicializa el lienzo
+ * se limpia y se renderizan los nodos
  */
-
-function showTree(color = false) {
+function mostrarArbol(color = false) {  
   measure(root);
-  initCanvas();
-  clear();
+  inicialiizarCanva();
+  limpiar();
   render(root, canvas.width / 2, 10 + radius, color);
 }
 
+//Se definen las variables del canva, controlan el camaño
 var radius = 20;
 var spacing = 20;
 var height = radius * 2 + 30;
 var padding = 20;
-
-/***
- * CREAR CANVA EN BLANCO
- */
-
 var root = null;
 var canvas = null;
 var ctx = null;
 
 /***
- * CAMBIAR TAMAÑO CANVA
+ * funcion para inicializar el canva
  */
-
-function initCanvas() {
+function inicialiizarCanva() {
   canvas = document.getElementById("canvas");
   const cvHeight = (root.altura - 1) * height + radius * 2 + padding * 2;
   const cvWidth = root.width + padding * 2;
@@ -145,10 +172,11 @@ function initCanvas() {
 }
 
 /***
- * LIMPIAR CANVA
+ * se define la funcion para vaciar la informacion que tenga el canva
+ * se una una funcion externa para ello, definiendo el tamaño del canva
  */
 
-function clear() {
+function limpiar() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
@@ -334,7 +362,7 @@ function randomSet() {
 function randomAVLTree() {
   let input = document.getElementById("inputAVL");
   input.value = randomSet().toString();
-  generateAVL();
+  generarAVL();
 }
 
 /**
@@ -343,5 +371,5 @@ function randomAVLTree() {
 function randomRBTree() {
   let input = document.getElementById("inputRBT");
   input.value = randomSet().toString();
-  generateRBTree();
+  generarRojoYNegro();
 }
