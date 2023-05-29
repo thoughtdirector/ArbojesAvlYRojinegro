@@ -5,7 +5,7 @@ function randomRBTreeRemove() {
   let index = Math.ceil(Math.random() * array.length - 1);
   RBTreeRemove(root, array[index]);
   array.splice(index);
-  root = definirRaiz(root);
+  root = obtenerRaiz(root);
   // let isRB = isRBTree(root);
   // if (!isRB) {
   //   console.log("remove value:" + array[index] + "====isRB:"+isRB);

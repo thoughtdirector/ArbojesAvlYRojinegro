@@ -120,7 +120,7 @@ function eliminarRojoYNegro() {
         break;
       } else {
         RBTreeRemove(root, num);
-        root = definirRaiz(root);
+        root = obtenerRaiz(root);
       }
     }
   }
@@ -148,11 +148,6 @@ var radius = 20;
 var spacing = 20;
 var height = radius * 2 + 30;
 var padding = 20;
-
-/***
- * CREAR CANVA EN BLANCO
- */
-
 var root = null;
 var canvas = null;
 var ctx = null;
@@ -180,7 +175,6 @@ function inicialiizarCanva() {
  * se define la funcion para vaciar la informacion que tenga el canva
  * se una una funcion externa para ello, definiendo el tamaño del canva
  */
-
 function limpiar() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
@@ -189,14 +183,13 @@ function limpiar() {
  *
  * @param nodo
  */
-
 function measure(nodo) {
   if (nodo == null) {
     return;
   }
   if (!nodo.hijoIzquierdo && !nodo.hijoDerecho) {
     nodo.isLinkedList = true;
-    nodo.ancho = radius * 2;
+    nodo.width = radius * 2;
     return;
   }
   measure(nodo.hijoIzquierdo);
@@ -208,16 +201,16 @@ function measure(nodo) {
 
   let fixNode = null;
   if (!nodo.hijoIzquierdo || !nodo.hijoDerecho) {
-    nodo.ancho = leftWidth + rightWidth;
-    nodo.ancho += spacing;
-    nodo.desplazamiento = spacing / 2;
+    nodo.width = leftWidth + rightWidth;
+    nodo.width += spacing;
+    nodo.offset = spacing / 2;
   } else {
     // SE DEFINE EL NUEVO ESPACIO A OCUPAR
     let childSpace = Math.max(rightWidth, leftWidth);
     let factor =
       obtenerAltura(nodo.hijoIzquierdo) - obtenerAltura(nodo.hijoDerecho);
-    nodo.ancho = childSpace * 2;
-    nodo.desplazamiento = childSpace / 2;
+    nodo.width = childSpace * 2;
+    nodo.offset = childSpace / 2;
     let mixWidth = Math.abs(leftWidth - rightWidth) / 2;
     if (factor > 0) {
       if (leftWidth >= rightWidth) {
@@ -241,36 +234,36 @@ function measure(nodo) {
         fixNode = nodo.hijoDerecho;
       }
     }
-    nodo.ancho -= mixWidth;
-    nodo.desplazamiento -= mixWidth / 2;
+    nodo.width -= mixWidth;
+    nodo.offset -= mixWidth / 2;
     // SE AÑADE EL ESPACIO ENTRE NODOS
-    nodo.ancho += spacing;
-    nodo.desplazamiento += spacing / 2;
+    nodo.width += spacing;
+    nodo.offset += spacing / 2;
     // SE GENERA DISTANCIA ENTRE LOS NODOS HIJOS
     let distance = childSpace - mixWidth + spacing;
     if (fixNode) {
-      let fix = fixWidth(fixNode.desplazamiento, distance);
-      nodo.ancho += fix;
-      nodo.desplazamiento += fix / 2;
+      let fix = fixWidth(fixNode.offset, distance);
+      nodo.width += fix;
+      nodo.offset += fix / 2;
     }
   }
 }
 
 /**
  *
- * @param desplazamiento
+ * @param offset
  * @param distance
  * @returns {number}
  */
-function fixWidth(desplazamiento, distance) {
+function fixWidth(offset, distance) {
   // VERIFICAR SI HAY NODOS O LINEAS SUPERPUESTAS
-  if (Math.atan(height / desplazamiento) < Math.asin(radius / distance)) {
+  if (Math.atan(height / offset) < Math.asin(radius / distance)) {
     let sR = radius * radius;
-    let sF = desplazamiento * desplazamiento;
+    let sF = offset * offset;
     let sD = distance * distance;
     let sH = height * height;
     let a = sR - sH;
-    let b = 2 * (sR * desplazamiento - sH * distance);
+    let b = 2 * (sR * offset - sH * distance);
     let c = sH * sR + sR * sF - sH * sD;
     let res = (-b + Math.sqrt(b * b - 4 * a * c)) / (2 * a);
     let res2 = (-b - Math.sqrt(b * b - 4 * a * c)) / (2 * a);
@@ -280,7 +273,7 @@ function fixWidth(desplazamiento, distance) {
 }
 
 function getWidth(nodo) {
-  return nodo ? nodo.ancho : 0;
+  return nodo ? nodo.width : 0;
 }
 
 /**
@@ -309,7 +302,7 @@ function render(nodo, x, y, color = false) {
     return;
   }
   if (nodo.hijoIzquierdo != null) {
-    let lx = x - nodo.desplazamiento;
+    let lx = x - nodo.offset;
     let ly = y + height;
     ctx.beginPath();
     ctx.moveTo(x, y);
@@ -318,7 +311,7 @@ function render(nodo, x, y, color = false) {
     render(nodo.hijoIzquierdo, lx, ly, color);
   }
   if (nodo.hijoDerecho != null) {
-    let rx = x + nodo.desplazamiento;
+    let rx = x + nodo.offset;
     let ry = y + height;
     ctx.beginPath();
     ctx.moveTo(x, y);

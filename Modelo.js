@@ -187,7 +187,7 @@ function isRed(nodo) {
   return nodo.color === ROJO;
 }
 
-function getRoot(nodo) {
+function obtenerRaiz(nodo) {
   if (nodo.padre) {
     return nodo.padre;
   }
