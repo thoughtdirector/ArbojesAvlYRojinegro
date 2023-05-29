@@ -10,7 +10,7 @@ var array;
  */
 
 function generarAVL() {
-  root = null;
+  raiz = null;
   insertarAVL();
 }
 
@@ -30,7 +30,7 @@ function insertarAVL() {
   for (let i = 0; i < array.length; i++) {
     let num = parseInt(array[i]);
     if (!isNaN(num)) {
-      root = BSTreeInsert(root, num, true);
+      raiz = BSTreeInsert(raiz, num, true);
     }
   }
   mostrarArbol();
@@ -50,7 +50,7 @@ function eliminarAVL() {
   for (let i = 0; i < array.length; i++) {
     let num = parseInt(array[i]);
     if (!isNaN(num)) {
-      root = BSTreeRemove(root, num, true);
+      raiz = BSTreeRemove(raiz, num, true);
     }
   }
   mostrarArbol();
@@ -65,8 +65,8 @@ function eliminarAVL() {
  */
 
 function generarRojoYNegro() {
-  root = null;
-  insertarRojoYNegro();
+  raiz = null;
+  insercionRojoYNegro();
 }
 
 /**
@@ -79,15 +79,15 @@ function generarRojoYNegro() {
  * se define el color de la raiz como negro
  */
 
-function insertarRojoYNegro() {
+function insercionRojoYNegro() {
   let input = document.getElementById("inputRBT");
   array = input.value.split(",");
 
   for (let i = 0; i < array.length; i++) {
     let num = parseInt(array[i]);
     if (!isNaN(num)) {
-      root = RBTreeInsert(root, num);
-      root.color = NEGRO;
+      raiz = InsertarNodoRojoYNegro(raiz, num);
+      raiz.color = NEGRO;
     }
   }
   mostrarArbol(true);
@@ -113,14 +113,14 @@ function eliminarRojoYNegro() {
     let num = parseInt(array[i]);
     if (!isNaN(num)) {
       if (
-        root == null ||
-        (root.hijoIzquierdo == null && root.hijoDerecho == null)
+        raiz == null ||
+        (raiz.hijoIzquierdo == null && raiz.hijoDerecho == null)
       ) {
-        root = null;
+        raiz = null;
         break;
       } else {
-        RBTreeRemove(root, num);
-        root = obtenerRaiz(root);
+        RBTreeRemove(raiz, num);
+        raiz = obtenerRaiz(raiz);
       }
     }
   }
@@ -137,18 +137,18 @@ function eliminarRojoYNegro() {
  * se limpia y se renderizan los nodos
  */
 function mostrarArbol(color = false) {  
-  medidas(root);
+  medidas(raiz);
   inicialiizarCanva();
   limpiar();
-  render(root, canvas.ancho / 2, 10 + radius, color);
+  render(raiz, canvas.width / 2, 10 + radio, color);
 }
 
 //Se definen las variables del canva, controlan el camaño
-var radius = 20;
-var spacing = 20;
-var height = radius * 2 + 30;
+var radio = 20;
+var espaciado = 20;
+var altura = radio * 2 + 30;
 var padding = 20;
-var root = null;
+var raiz = null;
 var canvas = null;
 var ctx = null;
 
@@ -157,12 +157,12 @@ var ctx = null;
  */
 function inicialiizarCanva() {
   canvas = document.getElementById("canvas");
-  const cvHeight = (root.altura - 1) * height + radius * 2 + padding * 2;
-  const cvWidth = root.ancho + padding * 2;
-  canvas.style.height = cvHeight + "px";
-  canvas.style.ancho = cvWidth + "px";
-  canvas.height = cvHeight;
-  canvas.ancho = cvWidth;
+  const cvAltura = (raiz.altura - 1) * altura + radio * 2 + padding * 2;
+  const cvAncho = raiz.ancho + padding * 2;
+  canvas.style.height = cvAltura + "px";
+  canvas.style.width = cvAncho + "px";
+  canvas.height = cvAltura;
+  canvas.width = cvAncho;
   ctx = canvas.getContext("2d");
   ctx.strokeStyle = "#000";
   ctx.fillStyle = "#fff";
@@ -176,95 +176,100 @@ function inicialiizarCanva() {
  * se una una funcion externa para ello, definiendo el tamaño del canva
  */
 function limpiar() {
-  ctx.clearRect(0, 0, canvas.ancho, canvas.height);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
 /**
  *
  * @param nodo
  * se define una funcion que maneje las medidas, a la hora de dibujar el arbol
+ * se valida si el nodo es nulo, y en caso de no serlo, se retornan las medidas
+ * se obtiene el ancho de los sub nodos, y se define el nuevo espacio que van a ocupar
  */
 function medidas(nodo) {
   if (nodo == null) {
     return;
   }
   if (!nodo.hijoIzquierdo && !nodo.hijoDerecho) {
-    nodo.isLinkedList = true;
-    nodo.ancho = radius * 2;
+    nodo.esListaEnlazada = true;
+    nodo.ancho = radio * 2;
     return;
   }
   medidas(nodo.hijoIzquierdo);
   medidas(nodo.hijoDerecho);
 
   // ANCHO SUB ARBOL IZQUIERDO Y DERECHO
-  let leftWidth = obtenerAncho(nodo.hijoIzquierdo);
-  let rightWidth = obtenerAncho(nodo.hijoDerecho);
+  let anchoIzquierdo = obtenerAncho(nodo.hijoIzquierdo);
+  let anchoDerecho = obtenerAncho(nodo.hijoDerecho);
 
   let fixNodo = null;
   if (!nodo.hijoIzquierdo || !nodo.hijoDerecho) {
-    nodo.ancho = leftWidth + rightWidth;
-    nodo.ancho += spacing;
-    nodo.offset = spacing / 2;
+    nodo.ancho = anchoIzquierdo + anchoDerecho;
+    nodo.ancho += espaciado;
+    nodo.desplazamiento = espaciado / 2;
   } else {
     // SE DEFINE EL NUEVO ESPACIO A OCUPAR
-    let childSpace = Math.max(rightWidth, leftWidth);
+    let espacioHijos = Math.max(anchoDerecho, anchoIzquierdo);
     let factor =
       obtenerAltura(nodo.hijoIzquierdo) - obtenerAltura(nodo.hijoDerecho);
-    nodo.ancho = childSpace * 2;
-    nodo.offset = childSpace / 2;
-    let mixWidth = Math.abs(leftWidth - rightWidth) / 2;
+    nodo.ancho = espacioHijos * 2;
+    nodo.desplazamiento = espacioHijos / 2;
+    let anchoGeneral = Math.abs(anchoIzquierdo - anchoDerecho) / 2;
     if (factor > 0) {
-      if (leftWidth >= rightWidth) {
+      if (anchoIzquierdo >= anchoDerecho) {
         // SE ACERCAN LOS NODOS PARA REDUCIR ESPACIO
         let div = Math.pow(2, obtenerAltura(nodo.hijoDerecho));
-        let leftSpace = leftWidth / div - radius;
-        if (leftSpace < 0) {
-          leftSpace = 0;
+        let espacioIzquierdo = anchoIzquierdo / div - radio;
+        if (espacioIzquierdo < 0) {
+          espacioIzquierdo = 0;
         }
-        mixWidth += leftSpace;
+        anchoGeneral += espacioIzquierdo;
         fixNodo = nodo.hijoIzquierdo;
       }
     } else if (factor < 0) {
-      if (rightWidth >= leftWidth) {
+      if (anchoDerecho >= anchoIzquierdo) {
         let div = Math.pow(2, obtenerAltura(nodo.hijoIzquierdo));
-        let rightSpace = rightWidth / div - radius;
-        if (rightSpace < 0) {
-          rightSpace = 0;
+        let espacioDerecho = anchoDerecho / div - radio;
+        if (espacioDerecho < 0) {
+          espacioDerecho = 0;
         }
-        mixWidth += rightSpace;
+        anchoGeneral += espacioDerecho;
         fixNodo = nodo.hijoDerecho;
       }
     }
-    nodo.ancho -= mixWidth;
-    nodo.offset -= mixWidth / 2;
+    nodo.ancho -= anchoGeneral;
+    nodo.desplazamiento -= anchoGeneral / 2;
     // SE AÑADE EL ESPACIO ENTRE NODOS
-    nodo.ancho += spacing;
-    nodo.offset += spacing / 2;
+    nodo.ancho += espaciado;
+    nodo.desplazamiento += espaciado / 2;
     // SE GENERA DISTANCIA ENTRE LOS NODOS HIJOS
-    let distance = childSpace - mixWidth + spacing;
+    let distanciahijos = espacioHijos - anchoGeneral + espaciado;
     if (fixNodo) {
-      let fix = fixWidth(fixNodo.offset, distance);
+      let fix = arreglarAncho(fixNodo.desplazamiento, distanciahijos);
       nodo.ancho += fix;
-      nodo.offset += fix / 2;
+      nodo.desplazamiento += fix / 2;
     }
   }
 }
 
 /**
  *
- * @param offset
- * @param distance
- * @returns {number}
+ * @param desplazamiento
+ * @param distanciahijos
+ * @returns {number} 
+ * 
+ * se define la funcion para arreglar el ancho a la hora de 
+ * balancear el arbol 
  */
-function fixWidth(offset, distance) {
+function arreglarAncho(desplazamiento, distanciahijos) {
   // VERIFICAR SI HAY NODOS O LINEAS SUPERPUESTAS
-  if (Math.atan(height / offset) < Math.asin(radius / distance)) {
-    let sR = radius * radius;
-    let sF = offset * offset;
-    let sD = distance * distance;
-    let sH = height * height;
+  if (Math.atan(altura / desplazamiento) < Math.asin(radio / distanciahijos)) {
+    let sR = radio * radio;
+    let sF = desplazamiento * desplazamiento;
+    let sD = distanciahijos * distanciahijos;
+    let sH = altura * altura;
     let a = sR - sH;
-    let b = 2 * (sR * offset - sH * distance);
+    let b = 2 * (sR * desplazamiento - sH * distanciahijos);
     let c = sH * sR + sR * sF - sH * sD;
     let res = (-b + Math.sqrt(b * b - 4 * a * c)) / (2 * a);
     let res2 = (-b - Math.sqrt(b * b - 4 * a * c)) / (2 * a);
@@ -279,10 +284,12 @@ function obtenerAncho(nodo) {
 
 /**
  * SE VERIFICA SI EL SUB-ARBOL ES UNA LISTA ENLAZADA
+ * 
+ * se verifica matematicamente si el sub-arbol es una lista enlasada
  * @param nodo
  * @returns {boolean}
  */
-function isLinkedList(nodo) {
+function esListaEnlazada(nodo) {
   let factor = Math.abs(
     obtenerAltura(nodo.hijoIzquierdo) - obtenerAltura(nodo.hijoDerecho)
   );
@@ -293,6 +300,10 @@ function isLinkedList(nodo) {
 
 /**
  * SE DIBUJA EL ARBOL EN PANTALLA
+ * 
+ * se dibuja en pantalla en nodo pasandole los parametros de altura
+ * ancho y color(en caso de ser un arbol rojo y negro)
+ * tambien se verifica el desplazamiento del mismo nodo
  * @param nodo
  * @param x
  * @param y
@@ -303,8 +314,8 @@ function render(nodo, x, y, color = false) {
     return;
   }
   if (nodo.hijoIzquierdo != null) {
-    let lx = x - nodo.offset;
-    let ly = y + height;
+    let lx = x - nodo.desplazamiento;
+    let ly = y + altura;
     ctx.beginPath();
     ctx.moveTo(x, y);
     ctx.lineTo(lx, ly);
@@ -312,8 +323,8 @@ function render(nodo, x, y, color = false) {
     render(nodo.hijoIzquierdo, lx, ly, color);
   }
   if (nodo.hijoDerecho != null) {
-    let rx = x + nodo.offset;
-    let ry = y + height;
+    let rx = x + nodo.desplazamiento;
+    let ry = y + altura;
     ctx.beginPath();
     ctx.moveTo(x, y);
     ctx.lineTo(rx, ry);
@@ -321,7 +332,7 @@ function render(nodo, x, y, color = false) {
     render(nodo.hijoDerecho, rx, ry, color);
   }
   ctx.beginPath();
-  ctx.arc(x, y, radius, 0, 2 * Math.PI);
+  ctx.arc(x, y, radio, 0, 2 * Math.PI);
   ctx.closePath();
   if (color) {
     ctx.fillStyle = nodo.color === ROJO ? "red" : "black";
@@ -358,7 +369,7 @@ function randomSet() {
 /**
  * INSERTAR ALEATORIO AVL
  */
-function randomAVLTree() {
+function llenadoAleatorioAVL() {
   let input = document.getElementById("inputAVL");
   input.value = randomSet().toString();
   generarAVL();

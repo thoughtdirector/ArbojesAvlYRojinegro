@@ -3,21 +3,21 @@
  */
 function randomRBTreeRemove() {
   let index = Math.ceil(Math.random() * array.length - 1);
-  RBTreeRemove(root, array[index]);
+  RBTreeRemove(raiz, array[index]);
   array.splice(index);
-  root = obtenerRaiz(root);
-  // let isRB = isRBTree(root);
+  raiz = obtenerRaiz(raiz);
+  // let isRB = isRBTree(raiz);
   // if (!isRB) {
   //   console.log("remove value:" + array[index] + "====isRB:"+isRB);
   // }
   mostrarArbol(true);
 }
 
-function randomAVLTreeRemove() {
+function llenadoAleatorioAVLEliminacion() {
   let index = Math.ceil(Math.random() * array.length - 1);
-  root = BSTreeRemove(root, array[index], true);
+  raiz = BSTreeRemove(raiz, array[index], true);
   array.splice(index);
-  // let res = isAVL(root);
+  // let res = isAVL(raiz);
   // if (!res) {
   //   console.log("remove value:" + array[index] + "====isAVL:"+res);
   // }

@@ -23,14 +23,14 @@ function obtenerAltura(nodo) {
  * @param nodo
  * @returns {number}
  */
-function obtenerFactorDeBalance(nodo) {
+function obtenerFactorDeEquilibrio(nodo) {
   let lh = obtenerAltura(nodo.hijoIzquierdo);
   let rh = obtenerAltura(nodo.hijoDerecho);
   return lh - rh;
 }
 
 /**
- * 获取排序树最小节点
+ * Obtenga el nodo más pequeño del árbol de clasificación
  * @param nodo
  * @returns {*}
  */
@@ -43,10 +43,14 @@ function getBSTreeMin(nodo) {
 
 /**
  * ROTACION A LA DERECHA
+ * 
+ * se define la rotacion hacia la derecha para ser usado
+ * despues a la hora de balancear los arboles, toda la rotacion
+ * se hace segun la altura de los nodos
  * @param nodo
  * @returns {*}
  */
-function rightRotate(nodo) {
+function rotacionDerecha(nodo) {
   let r = nodo.hijoIzquierdo;
   nodo.hijoIzquierdo = r.hijoDerecho;
   if (nodo.hijoIzquierdo != null) {
@@ -67,10 +71,14 @@ function rightRotate(nodo) {
 
 /**
  * ROTACION A LA IZQUIERDA
+ * 
+ *se define la rotacion hacia la izquierda para ser usado
+ * despues a la hora de balancear los arboles, toda la rotacion
+ * se hace segun la altura de los nodos
  * @param nodo
  * @returns {*}
  */
-function leftRotate(nodo) {
+function rotacionIzquierda(nodo) {
   let res = nodo.hijoDerecho;
   nodo.hijoDerecho = res.hijoIzquierdo;
   if (nodo.hijoDerecho != null) {
@@ -96,19 +104,19 @@ function leftRotate(nodo) {
  * @returns {*}
  */
 function balanceSelf(nodo) {
-  if (obtenerFactorDeBalance(nodo) > 1 && obtenerFactorDeBalance(nodo.hijoIzquierdo) >= 0) {
-    nodo = rightRotate(nodo);
+  if (obtenerFactorDeEquilibrio(nodo) > 1 && obtenerFactorDeEquilibrio(nodo.hijoIzquierdo) >= 0) {
+    nodo = rotacionDerecha(nodo);
   }
-  if (obtenerFactorDeBalance(nodo) < -1 && obtenerFactorDeBalance(nodo.hijoDerecho) <= 0) {
-    nodo = leftRotate(nodo);
+  if (obtenerFactorDeEquilibrio(nodo) < -1 && obtenerFactorDeEquilibrio(nodo.hijoDerecho) <= 0) {
+    nodo = rotacionIzquierda(nodo);
   }
-  if (obtenerFactorDeBalance(nodo) > 1 && obtenerFactorDeBalance(nodo.hijoIzquierdo) < 0) {
-    nodo.hijoIzquierdo = leftRotate(nodo.hijoIzquierdo);
-    nodo = rightRotate(nodo);
+  if (obtenerFactorDeEquilibrio(nodo) > 1 && obtenerFactorDeEquilibrio(nodo.hijoIzquierdo) < 0) {
+    nodo.hijoIzquierdo = rotacionIzquierda(nodo.hijoIzquierdo);
+    nodo = rotacionDerecha(nodo);
   }
-  if (obtenerFactorDeBalance(nodo) < -1 && obtenerFactorDeBalance(nodo.hijoDerecho) > 0) {
-    nodo.hijoDerecho = rightRotate(nodo.hijoDerecho);
-    nodo = leftRotate(nodo);
+  if (obtenerFactorDeEquilibrio(nodo) < -1 && obtenerFactorDeEquilibrio(nodo.hijoDerecho) > 0) {
+    nodo.hijoDerecho = rotacionDerecha(nodo.hijoDerecho);
+    nodo = rotacionIzquierda(nodo);
   }
   return nodo;
 }
@@ -201,15 +209,15 @@ function obtenerRaiz(nodo) {
  * @returns {Nodo|*}
  * @constructor
  */
-function RBTreeInsert(nodo, valor) {
+function InsertarNodoRojoYNegro(nodo, valor) {
   if (nodo == null) {
     return new Nodo(valor);
   }
   if (valor < nodo.valor) {
-    nodo.hijoIzquierdo = RBTreeInsert(nodo.hijoIzquierdo, valor);
+    nodo.hijoIzquierdo = InsertarNodoRojoYNegro(nodo.hijoIzquierdo, valor);
     nodo.hijoIzquierdo.padre = nodo;
   } else if (valor >= nodo.valor) {
-    nodo.hijoDerecho = RBTreeInsert(nodo.hijoDerecho, valor);
+    nodo.hijoDerecho = InsertarNodoRojoYNegro(nodo.hijoDerecho, valor);
     nodo.hijoDerecho.padre = nodo;
   }
   nodo.altura =
@@ -233,26 +241,26 @@ function RBTreeInsert(nodo, valor) {
       // LL
       nodo.color = ROJO;
       nodo.hijoIzquierdo.color = NEGRO;
-      nodo = rightRotate(nodo);
+      nodo = rotacionDerecha(nodo);
     } else if (isRed(nodo.hijoIzquierdo.hijoDerecho)) {
       // LR
-      nodo.hijoIzquierdo = leftRotate(nodo.hijoIzquierdo);
+      nodo.hijoIzquierdo = rotacionIzquierda(nodo.hijoIzquierdo);
       nodo.color = ROJO;
       nodo.hijoIzquierdo.color = NEGRO;
-      nodo = rightRotate(nodo);
+      nodo = rotacionDerecha(nodo);
     }
   } else if (isRed(nodo.hijoDerecho)) {
     if (isRed(nodo.hijoDerecho.hijoDerecho)) {
       // RR
       nodo.color = ROJO;
       nodo.hijoDerecho.color = NEGRO;
-      nodo = leftRotate(nodo);
+      nodo = rotacionIzquierda(nodo);
     } else if (isRed(nodo.hijoDerecho.hijoIzquierdo)) {
       // RL
-      nodo.hijoDerecho = rightRotate(nodo.hijoDerecho);
+      nodo.hijoDerecho = rotacionDerecha(nodo.hijoDerecho);
       nodo.color = ROJO;
       nodo.hijoDerecho.color = NEGRO;
-      nodo = leftRotate(nodo);
+      nodo = rotacionIzquierda(nodo);
     }
   }
   return nodo;
@@ -323,7 +331,7 @@ function fixRBNodo2(nodo) {
       if (isRed(brother)) {
         brother.color = NEGRO;
         brother.hijoIzquierdo.color = ROJO;
-        padre = leftRotate(padre);
+        padre = rotacionIzquierda(padre);
         linkParent(padre, grand);
         return padre;
       } else {
@@ -333,20 +341,20 @@ function fixRBNodo2(nodo) {
         } else if (brother.hijoDerecho == null) {
           brother.hijoIzquierdo.color = NEGRO;
           brother.color = ROJO;
-          brother = rightRotate(brother);
+          brother = rotacionDerecha(brother);
           padre.hijoDerecho = brother;
           brother.padre = padre;
           brother.color = padre.color;
           padre.color = NEGRO;
           brother.hijoDerecho.color = NEGRO;
-          padre = leftRotate(padre);
+          padre = rotacionIzquierda(padre);
           linkParent(padre, grand);
           return padre;
         } else {
           brother.color = padre.color;
           padre.color = NEGRO;
           brother.hijoDerecho.color = NEGRO;
-          padre = leftRotate(padre);
+          padre = rotacionIzquierda(padre);
           linkParent(padre, grand);
           return padre;
         }
@@ -356,7 +364,7 @@ function fixRBNodo2(nodo) {
       if (isRed(brother)) {
         brother.color = NEGRO;
         brother.hijoDerecho.color = ROJO;
-        padre = rightRotate(padre);
+        padre = rotacionDerecha(padre);
         linkParent(padre, grand);
         return padre;
       } else {
@@ -366,20 +374,20 @@ function fixRBNodo2(nodo) {
         } else if (brother.hijoIzquierdo == null) {
           brother.hijoDerecho.color = NEGRO;
           brother.color = ROJO;
-          brother = leftRotate(brother);
+          brother = rotacionIzquierda(brother);
           padre.hijoIzquierdo = brother;
           brother.padre = padre;
           brother.color = padre.color;
           padre.color = NEGRO;
           brother.hijoIzquierdo.color = NEGRO;
-          padre = rightRotate(padre);
+          padre = rotacionDerecha(padre);
           linkParent(padre, grand);
           return padre;
         } else {
           brother.color = padre.color;
           padre.color = NEGRO;
           brother.hijoIzquierdo.color = NEGRO;
-          padre = rightRotate(padre);
+          padre = rotacionDerecha(padre);
           linkParent(padre, grand);
           return padre;
         }
@@ -406,7 +414,7 @@ function fixRBNodo(nodo) {
           brother.color = padre.color;
           padre.color = NEGRO;
           brother.hijoDerecho.color = NEGRO;
-          padre = leftRotate(padre);
+          padre = rotacionIzquierda(padre);
           linkParent(padre, grand);
           break;
         } else if (
@@ -416,7 +424,7 @@ function fixRBNodo(nodo) {
           // CASO #2
           brother.hijoIzquierdo.color = NEGRO;
           brother.color = ROJO;
-          brother = rightRotate(brother);
+          brother = rotacionDerecha(brother);
           linkParent(brother, padre);
         } else if (
           !isRed(brother.hijoIzquierdo) &&
@@ -430,7 +438,7 @@ function fixRBNodo(nodo) {
         // CASO #4
         brother.color = NEGRO;
         padre.color = ROJO;
-        padre = leftRotate(padre);
+        padre = rotacionIzquierda(padre);
         linkParent(padre, grand);
       }
     } else {
@@ -441,7 +449,7 @@ function fixRBNodo(nodo) {
           brother.color = padre.color;
           padre.color = NEGRO;
           brother.hijoIzquierdo.color = NEGRO;
-          padre = rightRotate(padre);
+          padre = rotacionDerecha(padre);
           linkParent(padre, grand);
           break;
         } else if (
@@ -451,7 +459,7 @@ function fixRBNodo(nodo) {
           // CASO #6
           brother.hijoDerecho.color = NEGRO;
           brother.color = ROJO;
-          brother = leftRotate(brother);
+          brother = rotacionIzquierda(brother);
           linkParent(brother, padre);
         } else if (
           !isRed(brother.hijoIzquierdo) &&
@@ -465,7 +473,7 @@ function fixRBNodo(nodo) {
         // CASO #8
         brother.color = NEGRO;
         padre.color = ROJO;
-        padre = rightRotate(padre);
+        padre = rotacionDerecha(padre);
         linkParent(padre, grand);
       }
     }
