@@ -30,7 +30,7 @@ function insertarAVL() {
   for (let i = 0; i < array.length; i++) {
     let num = parseInt(array[i]);
     if (!isNaN(num)) {
-      raiz = insertarNodo(raiz, num, true);
+      raiz = insertarNodoAVL(raiz, num, true);
     }
   }
   mostrarArbol();
@@ -50,7 +50,7 @@ function eliminarAVL() {
   for (let i = 0; i < array.length; i++) {
     let num = parseInt(array[i]);
     if (!isNaN(num)) {
-      raiz = EliminarNodo(raiz, num, true);
+      raiz = EliminarNodoAVL(raiz, num, true);
     }
   }
   mostrarArbol();

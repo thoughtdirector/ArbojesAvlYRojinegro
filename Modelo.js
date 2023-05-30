@@ -45,6 +45,7 @@ function obtenerNodoMenor(nodo) {
 /**
  * ROTACION A LA DERECHA
  *
+ * el parametro recibido es el nodo padre
  * se define la rotacion hacia la derecha para ser usado
  * despues a la hora de balancear los arboles, toda la rotacion
  * se hace segun la altura de los nodos
@@ -173,26 +174,24 @@ function balancearAVL(nodo) {
 }
 
 /**
- * Insercion de un nodo
+ * Insercion de un nodo AVL
  * @param nodo raiz donde se va a insertar
  * @param valor valor del nodo a insertar
- * @param estaBalanceado
  * @returns {Nodo|*}
  */
-function insertarNodo(nodo, valor, estaBalanceado) {
+function insertarNodoAVL(nodo, valor) {
   // Retorna un nuevo nodo si el arbol esta vacio
   if (nodo == null) {
     return new Nodo(valor);
   }
   // Inserta el nodo de manera recursiva, hasta llegar a la hoja
   if (valor < nodo.valor) {
-    nodo.hijoIzquierdo = insertarNodo(
+    nodo.hijoIzquierdo = insertarNodoAVL(
       nodo.hijoIzquierdo,
-      valor,
-      estaBalanceado
+      valor
     );
   } else if (valor >= nodo.valor) {
-    nodo.hijoDerecho = insertarNodo(nodo.hijoDerecho, valor, estaBalanceado);
+    nodo.hijoDerecho = insertarNodoAVL(nodo.hijoDerecho, valor);
   }
   // Recalcula altura, recursivamente de abajo hacia arriba
   nodo.altura =
@@ -201,9 +200,9 @@ function insertarNodo(nodo, valor, estaBalanceado) {
       obtenerAltura(nodo.hijoDerecho)
     ) + 1;
   // balancea el arbol si es necesario
-  if (estaBalanceado) {
-    nodo = balancearAVL(nodo);
-  }
+
+  nodo = balancearAVL(nodo);
+
   return nodo;
 }
 
@@ -211,23 +210,21 @@ function insertarNodo(nodo, valor, estaBalanceado) {
  * Eliminacion de un nodo
  * @param nodo raiz de don de se busca eliminar
  * @param valor valor del nodo a eliminar
- * @param estaBalanceado
  * @returns {Nodo|*}
  */
-function EliminarNodo(nodo, valor, estaBalanceado) {
+function EliminarNodoAVL(nodo, valor) {
   // Retorna null si el arbol esta vacio
   if (nodo == null) {
     return null;
   }
   // Se busca el nodo a eliminar de manera recursiva
   if (valor < nodo.valor) {
-    nodo.hijoIzquierdo = EliminarNodo(
+    nodo.hijoIzquierdo = EliminarNodoAVL(
       nodo.hijoIzquierdo,
-      valor,
-      estaBalanceado
+      valor
     );
   } else if (valor > nodo.valor) {
-    nodo.hijoDerecho = EliminarNodo(nodo.hijoDerecho, valor, estaBalanceado);
+    nodo.hijoDerecho = EliminarNodoAVL(nodo.hijoDerecho, valor);
   } else {
     // El nodo actual es el nodo a eliminar
     if (nodo.hijoIzquierdo == null && nodo.hijoDerecho == null) {
@@ -238,10 +235,9 @@ function EliminarNodo(nodo, valor, estaBalanceado) {
       // Se busca el reemplazo (el mas a la izquierda de la rama derecha)
       let min = obtenerNodoMenor(nodo.hijoDerecho);
       // Se elimina el reemplazo
-      nodo.hijoDerecho = EliminarNodo(
+      nodo.hijoDerecho = EliminarNodoAVL(
         nodo.hijoDerecho,
-        min.valor,
-        estaBalanceado
+        min.valor
       );
       nodo.valor = min.valor;
     }
@@ -253,9 +249,8 @@ function EliminarNodo(nodo, valor, estaBalanceado) {
       obtenerAltura(nodo.hijoDerecho)
     ) + 1;
   // Se balancea el arbol si es necesario
-  if (estaBalanceado) {
-    nodo = balancearAVL(nodo);
-  }
+  nodo = balancearAVL(nodo);
+
   return nodo;
 }
 
