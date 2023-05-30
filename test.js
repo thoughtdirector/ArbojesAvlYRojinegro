@@ -3,7 +3,7 @@
  */
 function randomRBTreeRemove() {
   let index = Math.ceil(Math.random() * array.length - 1);
-  RBTreeRemove(raiz, array[index]);
+  EliminarNodoRojinegro(raiz, array[index]);
   array.splice(index);
   raiz = obtenerRaiz(raiz);
   // let isRB = isRBTree(raiz);
@@ -15,7 +15,7 @@ function randomRBTreeRemove() {
 
 function llenadoAleatorioAVLEliminacion() {
   let index = Math.ceil(Math.random() * array.length - 1);
-  raiz = BSTreeRemove(raiz, array[index], true);
+  raiz = EliminarNodo(raiz, array[index], true);
   array.splice(index);
   // let res = isAVL(raiz);
   // if (!res) {

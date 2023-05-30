@@ -5,7 +5,7 @@ var array;
 
 /**
  * CREACION ARBOL AVL
- * 
+ *
  * Se define la raiz con altura nula
  */
 
@@ -16,11 +16,11 @@ function generarAVL() {
 
 /**
  * INSERTAR NUEVOS NODOS ARBOL AVL
- * 
+ *
  * Se separan todos los nodos, por medio de la coma
- * luego son convertidos a int 
+ * luego son convertidos a int
  * se valida que el dato ingresado sea un numero
- * si pasa la validacion, se insertan al arbol 
+ * si pasa la validacion, se insertan al arbol
  */
 
 function insertarAVL() {
@@ -30,7 +30,7 @@ function insertarAVL() {
   for (let i = 0; i < array.length; i++) {
     let num = parseInt(array[i]);
     if (!isNaN(num)) {
-      raiz = BSTreeInsert(raiz, num, true);
+      raiz = insertarNodo(raiz, num, true);
     }
   }
   mostrarArbol();
@@ -38,11 +38,11 @@ function insertarAVL() {
 
 /**
  * REMOVER NODOS ARBOL AVL
- * 
+ *
  * Se separan todos los nodos, por medio de la coma
- * luego son convertidos a int 
+ * luego son convertidos a int
  * se valida que el dato ingresado sea un numero
- * si pasa la validacion, se remueven del arbol 
+ * si pasa la validacion, se remueven del arbol
  */
 function eliminarAVL() {
   let input = document.getElementById("inputAVL");
@@ -50,7 +50,7 @@ function eliminarAVL() {
   for (let i = 0; i < array.length; i++) {
     let num = parseInt(array[i]);
     if (!isNaN(num)) {
-      raiz = BSTreeRemove(raiz, num, true);
+      raiz = EliminarNodo(raiz, num, true);
     }
   }
   mostrarArbol();
@@ -60,8 +60,8 @@ function eliminarAVL() {
 
 /**
  * CREACION ARBOL ROJO Y NEGRO
- * 
-  * Se define la raiz con altura nula
+ *
+ * Se define la raiz con altura nula
  */
 
 function generarRojoYNegro() {
@@ -71,16 +71,16 @@ function generarRojoYNegro() {
 
 /**
  * INSERTAR NUEVOS NODOS ARBOL ROJO Y NEGRO
- * 
+ *
  * Se separan todos los nodos, por medio de la coma
- * luego son convertidos a int 
+ * luego son convertidos a int
  * se valida que el dato ingresado sea un numero
  * si pasa la validacion, se insertan al arbol
  * se define el color de la raiz como negro
  */
 
 function insercionRojoYNegro() {
-  let input = document.getElementById("inputRBT");
+  let input = document.getElementById("inputRN");
   array = input.value.split(",");
 
   for (let i = 0; i < array.length; i++) {
@@ -95,19 +95,19 @@ function insercionRojoYNegro() {
 
 /**
  * REMOVER NODOS ARBOL AVL
- * 
+ *
  * Se separan todos los nodos, por medio de la coma
- * luego son convertidos a int 
- * se valida que el dato ingresado sea un numero 
+ * luego son convertidos a int
+ * se valida que el dato ingresado sea un numero
  * si pasa la validacion se hacen las siguientes
  * se valida si la raiz es nula o ambos de sus hijos lo som
  * se define la raiz como nula y se rompe el programa en caso de que si
- * en caso de que no se remueven del arbol 
+ * en caso de que no se remueven del arbol
  * y se guareda el valor de la raiz
  */
 
 function eliminarRojoYNegro() {
-  let input = document.getElementById("inputRBT");
+  let input = document.getElementById("inputRN");
   let array = input.value.split(",");
   for (let i = 0; i < array.length; i++) {
     let num = parseInt(array[i]);
@@ -119,7 +119,7 @@ function eliminarRojoYNegro() {
         raiz = null;
         break;
       } else {
-        RBTreeRemove(raiz, num);
+        EliminarNodoRojinegro(raiz, num);
         raiz = obtenerRaiz(raiz);
       }
     }
@@ -131,12 +131,12 @@ function eliminarRojoYNegro() {
 
 /**
  * MOSTRAR ARBOLES
- * 
+ *
  * se define la raiz del arbol
  * se inicializa el lienzo
  * se limpia y se renderizan los nodos
  */
-function mostrarArbol(color = false) {  
+function mostrarArbol(color = false) {
   medidas(raiz);
   inicialiizarCanva();
   limpiar();
@@ -256,10 +256,10 @@ function medidas(nodo) {
  *
  * @param desplazamiento
  * @param distanciahijos
- * @returns {number} 
- * 
- * se define la funcion para arreglar el ancho a la hora de 
- * balancear el arbol 
+ * @returns {number}
+ *
+ * se define la funcion para arreglar el ancho a la hora de
+ * balancear el arbol
  */
 function arreglarAncho(desplazamiento, distanciahijos) {
   // VERIFICAR SI HAY NODOS O LINEAS SUPERPUESTAS
@@ -284,7 +284,7 @@ function obtenerAncho(nodo) {
 
 /**
  * SE VERIFICA SI EL SUB-ARBOL ES UNA LISTA ENLAZADA
- * 
+ *
  * se verifica matematicamente si el sub-arbol es una lista enlasada
  * @param nodo
  * @returns {boolean}
@@ -300,7 +300,7 @@ function esListaEnlazada(nodo) {
 
 /**
  * SE DIBUJA EL ARBOL EN PANTALLA
- * 
+ *
  * se dibuja en pantalla en nodo pasandole los parametros de altura
  * ancho y color(en caso de ser un arbol rojo y negro)
  * tambien se verifica el desplazamiento del mismo nodo
@@ -350,11 +350,11 @@ function render(nodo, x, y, color = false) {
 /**
  * GENERAR NODOS ALEATORIOS
  */
-function randomSet() {
-  let count = 50;
-  let array = new Array(count);
+function llenadoAleatorio() {
+  let cantidadNumeros = 50;
+  let array = new Array(cantidadNumeros);
   let set = new Set();
-  while (set.size < count) {
+  while (set.size < cantidadNumeros) {
     let num = Math.round(Math.random() * 500 + 1);
     set.add(num);
   }
@@ -371,7 +371,7 @@ function randomSet() {
  */
 function llenadoAleatorioAVL() {
   let input = document.getElementById("inputAVL");
-  input.value = randomSet().toString();
+  input.value = llenadoAleatorio().toString();
   generarAVL();
 }
 
@@ -379,7 +379,7 @@ function llenadoAleatorioAVL() {
  * INSERTAR ALEATORIO ROJO Y NEGRO
  */
 function randomRBTree() {
-  let input = document.getElementById("inputRBT");
-  input.value = randomSet().toString();
+  let input = document.getElementById("inputRN");
+  input.value = llenadoAleatorio().toString();
   generarRojoYNegro();
 }

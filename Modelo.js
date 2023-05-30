@@ -20,6 +20,7 @@ function obtenerAltura(nodo) {
 
 /**
  * Se obtiene el factor de equilibrio del nodo
+ * Se resta la altura de la rama izquierda con la derecha
  * @param nodo
  * @returns {number}
  */
@@ -30,11 +31,11 @@ function obtenerFactorDeEquilibrio(nodo) {
 }
 
 /**
- * Obtenga el nodo más pequeño del árbol de clasificación
+ * Se obtiene el nodo mas a la izquierda (el menor)
  * @param nodo
  * @returns {*}
  */
-function getBSTreeMin(nodo) {
+function obtenerNodoMenor(nodo) {
   while (nodo.hijoIzquierdo) {
     nodo = nodo.hijoIzquierdo;
   }
@@ -43,7 +44,7 @@ function getBSTreeMin(nodo) {
 
 /**
  * ROTACION A LA DERECHA
- * 
+ *
  * se define la rotacion hacia la derecha para ser usado
  * despues a la hora de balancear los arboles, toda la rotacion
  * se hace segun la altura de los nodos
@@ -51,6 +52,12 @@ function getBSTreeMin(nodo) {
  * @returns {*}
  */
 function rotacionDerecha(nodo) {
+  //      P      r
+  //     /      / \
+  //    r      H1  P
+  //   / \        /
+  //  H1 H2      H2
+  // Se realiza el intercambio de nodos
   let r = nodo.hijoIzquierdo;
   nodo.hijoIzquierdo = r.hijoDerecho;
   if (nodo.hijoIzquierdo != null) {
@@ -59,6 +66,7 @@ function rotacionDerecha(nodo) {
   r.hijoDerecho = nodo;
   r.hijoDerecho.padre = r;
   r.padre = null;
+  // Se actualiza la altura de los nodos
   nodo.altura =
     Math.max(
       obtenerAltura(nodo.hijoIzquierdo),
@@ -71,7 +79,7 @@ function rotacionDerecha(nodo) {
 
 /**
  * ROTACION A LA IZQUIERDA
- * 
+ *
  *se define la rotacion hacia la izquierda para ser usado
  * despues a la hora de balancear los arboles, toda la rotacion
  * se hace segun la altura de los nodos
@@ -79,6 +87,12 @@ function rotacionDerecha(nodo) {
  * @returns {*}
  */
 function rotacionIzquierda(nodo) {
+  //     P         r
+  //      \       / \
+  //       r     P  H2
+  //      / \     \
+  //     H1 H2     H1
+  // Se realiza el intercambio de nodos
   let res = nodo.hijoDerecho;
   nodo.hijoDerecho = res.hijoIzquierdo;
   if (nodo.hijoDerecho != null) {
@@ -87,6 +101,7 @@ function rotacionIzquierda(nodo) {
   res.hijoIzquierdo = nodo;
   res.hijoIzquierdo.padre = res;
   res.padre = null;
+  // Se actualiza la altura de los nodos
   nodo.altura =
     Math.max(
       obtenerAltura(nodo.hijoIzquierdo),
@@ -99,22 +114,58 @@ function rotacionIzquierda(nodo) {
 }
 
 /**
- * BALANCE ARBOLES SEGUN
+ * Balance en arboles AVL
  * @param nodo
  * @returns {*}
  */
-function balanceSelf(nodo) {
-  if (obtenerFactorDeEquilibrio(nodo) > 1 && obtenerFactorDeEquilibrio(nodo.hijoIzquierdo) >= 0) {
+function balancearAVL(nodo) {
+  // Caso 1
+  //              P
+  //            /
+  //           H
+  //         /
+  //       N
+  if (
+    obtenerFactorDeEquilibrio(nodo) > 1 &&
+    obtenerFactorDeEquilibrio(nodo.hijoIzquierdo) >= 0
+  ) {
     nodo = rotacionDerecha(nodo);
   }
-  if (obtenerFactorDeEquilibrio(nodo) < -1 && obtenerFactorDeEquilibrio(nodo.hijoDerecho) <= 0) {
+  // Caso 2
+  //     P
+  //      \
+  //       H
+  //        \
+  //         N
+  if (
+    obtenerFactorDeEquilibrio(nodo) < -1 &&
+    obtenerFactorDeEquilibrio(nodo.hijoDerecho) <= 0
+  ) {
     nodo = rotacionIzquierda(nodo);
   }
-  if (obtenerFactorDeEquilibrio(nodo) > 1 && obtenerFactorDeEquilibrio(nodo.hijoIzquierdo) < 0) {
+  // Caso 3
+  //     P
+  //    /
+  //  H
+  //   \
+  //    N
+  if (
+    obtenerFactorDeEquilibrio(nodo) > 1 &&
+    obtenerFactorDeEquilibrio(nodo.hijoIzquierdo) < 0
+  ) {
     nodo.hijoIzquierdo = rotacionIzquierda(nodo.hijoIzquierdo);
     nodo = rotacionDerecha(nodo);
   }
-  if (obtenerFactorDeEquilibrio(nodo) < -1 && obtenerFactorDeEquilibrio(nodo.hijoDerecho) > 0) {
+  // Caso 4
+  //     P
+  //      \
+  //       H
+  //     /
+  //   N
+  if (
+    obtenerFactorDeEquilibrio(nodo) < -1 &&
+    obtenerFactorDeEquilibrio(nodo.hijoDerecho) > 0
+  ) {
     nodo.hijoDerecho = rotacionDerecha(nodo.hijoDerecho);
     nodo = rotacionIzquierda(nodo);
   }
@@ -122,75 +173,93 @@ function balanceSelf(nodo) {
 }
 
 /**
- * 搜索树插入节点
- * @param nodo
- * @param valor
- * @param selfBalance 自平衡为AVL
+ * Insercion de un nodo
+ * @param nodo raiz donde se va a insertar
+ * @param valor valor del nodo a insertar
+ * @param estaBalanceado
  * @returns {Nodo|*}
  */
-function BSTreeInsert(nodo, valor, selfBalance) {
+function insertarNodo(nodo, valor, estaBalanceado) {
+  // Retorna un nuevo nodo si el arbol esta vacio
   if (nodo == null) {
     return new Nodo(valor);
   }
+  // Inserta el nodo de manera recursiva, hasta llegar a la hoja
   if (valor < nodo.valor) {
-    nodo.hijoIzquierdo = BSTreeInsert(nodo.hijoIzquierdo, valor, selfBalance);
+    nodo.hijoIzquierdo = insertarNodo(
+      nodo.hijoIzquierdo,
+      valor,
+      estaBalanceado
+    );
   } else if (valor >= nodo.valor) {
-    nodo.hijoDerecho = BSTreeInsert(nodo.hijoDerecho, valor, selfBalance);
+    nodo.hijoDerecho = insertarNodo(nodo.hijoDerecho, valor, estaBalanceado);
   }
-  // 重新计算高度，递归自底向上
+  // Recalcula altura, recursivamente de abajo hacia arriba
   nodo.altura =
     Math.max(
       obtenerAltura(nodo.hijoIzquierdo),
       obtenerAltura(nodo.hijoDerecho)
     ) + 1;
-  // AVL树平衡用
-  if (selfBalance) {
-    nodo = balanceSelf(nodo);
+  // balancea el arbol si es necesario
+  if (estaBalanceado) {
+    nodo = balancearAVL(nodo);
   }
   return nodo;
 }
 
 /**
- * 搜索树删除节点
- * @param nodo
- * @param valor
- * @param selfBalance 自平衡为AVL
+ * Eliminacion de un nodo
+ * @param nodo raiz de don de se busca eliminar
+ * @param valor valor del nodo a eliminar
+ * @param estaBalanceado
  * @returns {Nodo|*}
  */
-function BSTreeRemove(nodo, valor, selfBalance) {
+function EliminarNodo(nodo, valor, estaBalanceado) {
+  // Retorna null si el arbol esta vacio
   if (nodo == null) {
     return null;
   }
+  // Se busca el nodo a eliminar de manera recursiva
   if (valor < nodo.valor) {
-    nodo.hijoIzquierdo = BSTreeRemove(nodo.hijoIzquierdo, valor, selfBalance);
+    nodo.hijoIzquierdo = EliminarNodo(
+      nodo.hijoIzquierdo,
+      valor,
+      estaBalanceado
+    );
   } else if (valor > nodo.valor) {
-    nodo.hijoDerecho = BSTreeRemove(nodo.hijoDerecho, valor, selfBalance);
+    nodo.hijoDerecho = EliminarNodo(nodo.hijoDerecho, valor, estaBalanceado);
   } else {
-    // 当前节点为待删除节点
+    // El nodo actual es el nodo a eliminar
     if (nodo.hijoIzquierdo == null && nodo.hijoDerecho == null) {
       return null;
     } else if (nodo.hijoIzquierdo == null || nodo.hijoDerecho == null) {
       return nodo.hijoIzquierdo == null ? nodo.hijoDerecho : nodo.hijoIzquierdo;
     } else {
-      // 左右子节点都不为空，找到右子节点的最小子节点
-      let min = getBSTreeMin(nodo.hijoDerecho);
-      // 删除最小子节点
-      nodo.hijoDerecho = BSTreeRemove(nodo.hijoDerecho, min.valor, selfBalance);
+      // Se busca el reemplazo (el mas a la izquierda de la rama derecha)
+      let min = obtenerNodoMenor(nodo.hijoDerecho);
+      // Se elimina el reemplazo
+      nodo.hijoDerecho = EliminarNodo(
+        nodo.hijoDerecho,
+        min.valor,
+        estaBalanceado
+      );
       nodo.valor = min.valor;
     }
   }
+  // Se recalcula la altura de los nodos
   nodo.altura =
     Math.max(
       obtenerAltura(nodo.hijoIzquierdo),
       obtenerAltura(nodo.hijoDerecho)
     ) + 1;
-  if (selfBalance) {
-    nodo = balanceSelf(nodo);
+  // Se balancea el arbol si es necesario
+  if (estaBalanceado) {
+    nodo = balancearAVL(nodo);
   }
   return nodo;
 }
 
-function isRed(nodo) {
+function esRojo(nodo) {
   if (nodo == null) return false;
   return nodo.color === ROJO;
 }
@@ -204,15 +273,17 @@ function obtenerRaiz(nodo) {
 
 /**
  * INSERTAR NODO ARBOL ROJO Y NEGRO
- * @param nodo
- * @param valor
+ * @param nodo raiz donde se busca
+ * @param valor valor a elimina
  * @returns {Nodo|*}
  * @constructor
  */
 function InsertarNodoRojoYNegro(nodo, valor) {
+  // Retorna un nuevo nodo si el arbol esta vacio
   if (nodo == null) {
     return new Nodo(valor);
   }
+  // Inserta el nodo de manera recursiva, hasta llegar a la hoja
   if (valor < nodo.valor) {
     nodo.hijoIzquierdo = InsertarNodoRojoYNegro(nodo.hijoIzquierdo, valor);
     nodo.hijoIzquierdo.padre = nodo;
@@ -220,43 +291,49 @@ function InsertarNodoRojoYNegro(nodo, valor) {
     nodo.hijoDerecho = InsertarNodoRojoYNegro(nodo.hijoDerecho, valor);
     nodo.hijoDerecho.padre = nodo;
   }
+  // Calcula la altura del nodo
   nodo.altura =
     Math.max(
       obtenerAltura(nodo.hijoIzquierdo),
       obtenerAltura(nodo.hijoDerecho)
     ) + 1;
-  if (isRed(nodo.hijoIzquierdo) && isRed(nodo.hijoDerecho)) {
+  // Se usa el nodo como abuelo y se verifica si se necesita equilibrar
+  if (esRojo(nodo.hijoIzquierdo) && esRojo(nodo.hijoDerecho)) {
+    // Si el nodo padre del nodo insertado es de color rojo, y el hermano del nodo padre también es de color rojo,
+    // es decir, abuelo->padre->nodo insertado = negro->rojo->rojo, se puede cambiar el color de las tres capas a rojo->negro->rojo.
     if (
-      isRed(nodo.hijoIzquierdo.hijoIzquierdo) ||
-      isRed(nodo.hijoIzquierdo.hijoDerecho) ||
-      isRed(nodo.hijoDerecho.hijoDerecho) ||
-      isRed(nodo.hijoDerecho.hijoIzquierdo)
+      esRojo(nodo.hijoIzquierdo.hijoIzquierdo) ||
+      esRojo(nodo.hijoIzquierdo.hijoDerecho) ||
+      esRojo(nodo.hijoDerecho.hijoDerecho) ||
+      esRojo(nodo.hijoDerecho.hijoIzquierdo)
     ) {
       nodo.hijoIzquierdo.color = NEGRO;
       nodo.hijoDerecho.color = NEGRO;
       nodo.color = ROJO;
     }
-  } else if (isRed(nodo.hijoIzquierdo)) {
-    if (isRed(nodo.hijoIzquierdo.hijoIzquierdo)) {
-      // LL
+  } else if (esRojo(nodo.hijoIzquierdo)) {
+    // El nodo padre del nodo insertado es de color rojo,
+    // y el hermano del nodo padre es de color negro
+    if (esRojo(nodo.hijoIzquierdo.hijoIzquierdo)) {
+      // Rotar hacia la derecha el nodo abuelo.
       nodo.color = ROJO;
       nodo.hijoIzquierdo.color = NEGRO;
       nodo = rotacionDerecha(nodo);
-    } else if (isRed(nodo.hijoIzquierdo.hijoDerecho)) {
-      // LR
+    } else if (esRojo(nodo.hijoIzquierdo.hijoDerecho)) {
+      // Rotar a la derecha y luego a la izquierda
       nodo.hijoIzquierdo = rotacionIzquierda(nodo.hijoIzquierdo);
       nodo.color = ROJO;
       nodo.hijoIzquierdo.color = NEGRO;
       nodo = rotacionDerecha(nodo);
     }
-  } else if (isRed(nodo.hijoDerecho)) {
-    if (isRed(nodo.hijoDerecho.hijoDerecho)) {
-      // RR
+  } else if (esRojo(nodo.hijoDerecho)) {
+    if (esRojo(nodo.hijoDerecho.hijoDerecho)) {
+      // ++
       nodo.color = ROJO;
       nodo.hijoDerecho.color = NEGRO;
       nodo = rotacionIzquierda(nodo);
-    } else if (isRed(nodo.hijoDerecho.hijoIzquierdo)) {
-      // RL
+    } else if (esRojo(nodo.hijoDerecho.hijoIzquierdo)) {
+      // +-
       nodo.hijoDerecho = rotacionDerecha(nodo.hijoDerecho);
       nodo.color = ROJO;
       nodo.hijoDerecho.color = NEGRO;
@@ -268,23 +345,26 @@ function InsertarNodoRojoYNegro(nodo, valor) {
 
 /**
  * ELIMINACION DE NODOS ROJO Y NEGRO
- * @param nodo
- * @param valor
+ * @param nodo raiz donde se elimina
+ * @param valor valor a eliminar
  * @returns {null|*}
  * @constructor
  */
-function RBTreeRemove(nodo, valor) {
+function EliminarNodoRojinegro(nodo, valor) {
+  // Si el arbol esta vacio no se hace nada
   if (nodo == null) {
     return;
   }
   if (valor < nodo.valor) {
-    RBTreeRemove(nodo.hijoIzquierdo, valor);
+    EliminarNodoRojinegro(nodo.hijoIzquierdo, valor);
   } else if (valor > nodo.valor) {
-    RBTreeRemove(nodo.hijoDerecho, valor);
+    EliminarNodoRojinegro(nodo.hijoDerecho, valor);
   } else {
+    // Rotar hacia la derecha el nodo que se desea eliminar
     if (nodo.hijoIzquierdo == null && nodo.hijoDerecho == null) {
-      // CASO #1
-      fixRBNodo(nodo);
+      // CASO #1 eliminar el nodo hoja
+      arreglarNodoRojinegro(nodo);
+      // Eliminar el nodo despues de haber arreglado el arbol
       if (nodo === nodo.padre.hijoIzquierdo) {
         nodo.padre.hijoIzquierdo = null;
       } else {
@@ -292,20 +372,27 @@ function RBTreeRemove(nodo, valor) {
       }
       nodo.padre = null;
     } else if (nodo.hijoIzquierdo == null || nodo.hijoDerecho == null) {
-      // CASO #2
-      let child =
+      // CASO #2 Eliminar el nodo que tiene un solo hijo
+      //       -
+      //     /    \
+      //eliminado  -
+      //   /      / \
+      //  H      -   -
+      // Eliminar el nodo y remplazarlo por su hijo
+      let hijo =
         nodo.hijoIzquierdo == null ? nodo.hijoDerecho : nodo.hijoIzquierdo;
-      nodo.valor = child.valor;
-      //CASO #1
-      RBTreeRemove(child, child.valor);
+      nodo.valor = hijo.valor;
+      // Cambiar a caso #1
+      EliminarNodoRojinegro(hijo, hijo.valor);
     } else {
-      // CASO #3
-      let min = getBSTreeMin(nodo.hijoDerecho);
+      // CASO #3 Encontrar el sucesor (El nodo mas a la izquierda de la rama derecha)
+      let min = obtenerNodoMenor(nodo.hijoDerecho);
       nodo.valor = min.valor;
-      // 转为CASO #1或CASO #2
-      RBTreeRemove(min, min.valor);
+      // Se convierte en caso #1 o #2
+      EliminarNodoRojinegro(min, min.valor);
     }
   }
+  // Se actualiza la altura del nodo
   nodo.altura =
     Math.max(
       obtenerAltura(nodo.hijoIzquierdo),
@@ -314,175 +401,123 @@ function RBTreeRemove(nodo, valor) {
 }
 
 /**
- * ARREGLOS SEGUN ELIMINACION ROJO Y NEGRO
- * @param nodo
- * @returns {*}
- */
-function fixRBNodo2(nodo) {
-  let padre = nodo.padre;
-  if (padre == null) {
-    return nodo;
-  }
-  let grand = nodo.padre.padre;
-  let brother;
-  if (nodo.color === NEGRO) {
-    if (nodo.valor < padre.valor) {
-      brother = padre.hijoDerecho;
-      if (isRed(brother)) {
-        brother.color = NEGRO;
-        brother.hijoIzquierdo.color = ROJO;
-        padre = rotacionIzquierda(padre);
-        linkParent(padre, grand);
-        return padre;
-      } else {
-        if (brother.hijoIzquierdo == null && brother.hijoDerecho == null) {
-          brother.color = ROJO;
-          return fixRBNodo2(padre);
-        } else if (brother.hijoDerecho == null) {
-          brother.hijoIzquierdo.color = NEGRO;
-          brother.color = ROJO;
-          brother = rotacionDerecha(brother);
-          padre.hijoDerecho = brother;
-          brother.padre = padre;
-          brother.color = padre.color;
-          padre.color = NEGRO;
-          brother.hijoDerecho.color = NEGRO;
-          padre = rotacionIzquierda(padre);
-          linkParent(padre, grand);
-          return padre;
-        } else {
-          brother.color = padre.color;
-          padre.color = NEGRO;
-          brother.hijoDerecho.color = NEGRO;
-          padre = rotacionIzquierda(padre);
-          linkParent(padre, grand);
-          return padre;
-        }
-      }
-    } else {
-      brother = padre.hijoIzquierdo;
-      if (isRed(brother)) {
-        brother.color = NEGRO;
-        brother.hijoDerecho.color = ROJO;
-        padre = rotacionDerecha(padre);
-        linkParent(padre, grand);
-        return padre;
-      } else {
-        if (brother.hijoIzquierdo == null && brother.hijoDerecho == null) {
-          brother.color = ROJO;
-          return fixRBNodo2(padre);
-        } else if (brother.hijoIzquierdo == null) {
-          brother.hijoDerecho.color = NEGRO;
-          brother.color = ROJO;
-          brother = rotacionIzquierda(brother);
-          padre.hijoIzquierdo = brother;
-          brother.padre = padre;
-          brother.color = padre.color;
-          padre.color = NEGRO;
-          brother.hijoIzquierdo.color = NEGRO;
-          padre = rotacionDerecha(padre);
-          linkParent(padre, grand);
-          return padre;
-        } else {
-          brother.color = padre.color;
-          padre.color = NEGRO;
-          brother.hijoIzquierdo.color = NEGRO;
-          padre = rotacionDerecha(padre);
-          linkParent(padre, grand);
-          return padre;
-        }
-      }
-    }
-  }
-  return nodo;
-}
-
-/**
- * SE SELECCIONA EL CASO SEGUN LA ELIMINACION
+ * Arreglos que se deben hacer despues de eliminar un nodo
  * @param nodo
  */
-function fixRBNodo(nodo) {
+function arreglarNodoRojinegro(nodo) {
   while (nodo.padre != null && nodo.color === NEGRO) {
     let padre = nodo.padre;
-    let grand = padre.padre;
-    let brother;
+    let abuelo = padre.padre;
+    let hermano;
     if (nodo.valor < padre.valor) {
-      brother = padre.hijoDerecho;
-      if (!isRed(brother)) {
-        if (isRed(brother.hijoDerecho)) {
-          // CASO #1
-          brother.color = padre.color;
+      //Eliminar el nodo que es el hijo izquierdo de su nodo padre
+      hermano = padre.hijoDerecho;
+      if (!esRojo(hermano)) {
+        //El hermano del nodo a eliminar es de color negro
+        if (esRojo(hermano.hijoDerecho)) {
+          // CASO #1 El hijo derecho del hermano del nodo a eliminar es de color rojo, mientras que el hijo izquierdo puede tener cualquier color. Es decir, se cumple la condición ++
+          // Debido a la eliminación de un nodo negro en el subárbol izquierdo, simplemente toma un nodo rojo del subárbol derecho y lo cambia a negro
+          //       R/N             N            R/N           R/N
+          //       / \           /  \          /  \           / \
+          //    elim  N   =>  elim  R/N   =>  N   N   =>    N    N
+          //        /  \            / \      / \             \
+          //       -   R          -    N   del  -             -
+          hermano.color = padre.color;
+          //Transfiere el color del nodo padre al hermano. Tanto el nodo padre como el hijo derecho del hermano se vuelven negros, luego se realiza una rotación hacia la izquierda
           padre.color = NEGRO;
-          brother.hijoDerecho.color = NEGRO;
+          hermano.hijoDerecho.color = NEGRO;
           padre = rotacionIzquierda(padre);
-          linkParent(padre, grand);
+          enlazarPadre(padre, abuelo);
           break;
         } else if (
-          !isRed(brother.hijoDerecho) &&
-          isRed(brother.hijoIzquierdo)
+          !esRojo(hermano.hijoDerecho) &&
+          esRojo(hermano.hijoIzquierdo)
         ) {
-          // CASO #2
-          brother.hijoIzquierdo.color = NEGRO;
-          brother.color = ROJO;
-          brother = rotacionDerecha(brother);
-          linkParent(brother, padre);
+          // CASO #2 El hijo izquierdo del hermano del nodo a eliminar es de color rojo, mientras que el hijo derecho es de color negro o nulo. Es decir, se cumple la condición +-
+          //     R/N         R/N                   R/N
+          //     / \          / \     Rotacion     / \
+          //  elim  N  =>  elim  R    derecha   elim  N   =>  Se convierte en el caso 1 ++
+          //      /             /       =>             \
+          //     R            N                         R
+          hermano.hijoIzquierdo.color = NEGRO;
+          hermano.color = ROJO;
+          hermano = rotacionDerecha(hermano);
+          enlazarPadre(hermano, padre);
         } else if (
-          !isRed(brother.hijoIzquierdo) &&
-          !isRed(brother.hijoDerecho)
+          !esRojo(hermano.hijoIzquierdo) &&
+          !esRojo(hermano.hijoDerecho)
         ) {
-          // CASO #3
-          brother.color = ROJO;
+          // CASO #3 El hermano del nodo no tiene hijos o todos sus hijos son de color negro
+          //      R/N          R/N  <- Se vuelve a verificar el arbol desde aqui
+          //     /  \    =>    / \
+          //  elim   N      elim  R
+          //        / \          / \
+          //       N  N        N    N
+          hermano.color = ROJO;
           nodo = padre;
         }
       } else {
-        // CASO #4
-        brother.color = NEGRO;
+        // CASO #4 Si el hermano del nodo es de color rojo, entonces el nodo padre es de color negro y el hermano tiene dos hijos negros
+        //      N               R                   N
+        //     / \            /  \   Rotacion      / \
+        //  elim  R   =>   elim  N  izquierda     R  N   =>  Se convierte en caso 1/2/3
+        //      / \        / \         =>        /\
+        //     N  N       N  N               elim  N
+        hermano.color = NEGRO;
         padre.color = ROJO;
         padre = rotacionIzquierda(padre);
-        linkParent(padre, grand);
+        enlazarPadre(padre, abuelo);
       }
     } else {
-      brother = padre.hijoIzquierdo;
-      if (!isRed(brother)) {
-        if (isRed(brother.hijoIzquierdo)) {
-          // CASO #5
-          brother.color = padre.color;
+      // Eliminar el nodo que es el hijo derecho de su nodo padre
+      hermano = padre.hijoIzquierdo;
+      if (!esRojo(hermano)) {
+        // El hermano del nodo a eliminar es de color negro
+        if (esRojo(hermano.hijoIzquierdo)) {
+          // CASO #5 El hijo izquierdo del hermano del nodo a eliminar es de color rojo, mientras que el hijo derecho puede tener cualquier color. Es decir, se cumple la condición --
+          hermano.color = padre.color;
+          // Transfiere el color del nodo padre al hermano. Tanto el nodo padre como el hijo derecho del hermano se vuelven negros, luego se realiza una rotación hacia la izquierda
           padre.color = NEGRO;
-          brother.hijoIzquierdo.color = NEGRO;
+          hermano.hijoIzquierdo.color = NEGRO;
           padre = rotacionDerecha(padre);
-          linkParent(padre, grand);
+          enlazarPadre(padre, abuelo);
           break;
         } else if (
-          !isRed(brother.hijoIzquierdo) &&
-          isRed(brother.hijoDerecho)
+          !esRojo(hermano.hijoIzquierdo) &&
+          esRojo(hermano.hijoDerecho)
         ) {
-          // CASO #6
-          brother.hijoDerecho.color = NEGRO;
-          brother.color = ROJO;
-          brother = rotacionIzquierda(brother);
-          linkParent(brother, padre);
+          // CASO #6 El hijo derecho del hermano del nodo a eliminar es de color rojo, mientras que el hijo izquierdo es de color negro o nulo. Es decir, se cumple la condición -+
+          hermano.hijoDerecho.color = NEGRO;
+          hermano.color = ROJO;
+          hermano = rotacionIzquierda(hermano);
+          enlazarPadre(hermano, padre);
         } else if (
-          !isRed(brother.hijoIzquierdo) &&
-          !isRed(brother.hijoDerecho)
+          !esRojo(hermano.hijoIzquierdo) &&
+          !esRojo(hermano.hijoDerecho)
         ) {
-          // CASO #7
-          brother.color = ROJO;
+          // CASO #7 El hermano del nodo a eliminar no tiene hijos o todos sus hijos son de color negro
+          hermano.color = ROJO;
           nodo = padre;
         }
       } else {
-        // CASO #8
-        brother.color = NEGRO;
+        // CASO #8 Si el hermano del nodo es de color rojo, entonces el nodo padre es de color negro y el hermano tiene dos hijos negros
+        hermano.color = NEGRO;
         padre.color = ROJO;
         padre = rotacionDerecha(padre);
-        linkParent(padre, grand);
+        enlazarPadre(padre, abuelo);
       }
     }
   }
-  //SE CAMBIA EL COLOR AL FINAL
+  //Se cambia el color al final
   nodo.color = NEGRO;
 }
 
-function linkParent(nodo, padre) {
+/**
+ * Se enlazan el nuevo hijo y padre, se verifica si sera hijo derecho o izquierdo
+ * @param node nuevo hijo
+ * @param padre
+ */
+function enlazarPadre(nodo, padre) {
   if (padre) {
     if (nodo.valor < padre.valor) {
       padre.hijoIzquierdo = nodo;
